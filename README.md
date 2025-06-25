@@ -1,4 +1,4 @@
-# Log output application for 1.2 Exercise of Devops with Kubernetes
+# Server application for 1.2 Exercise of Devops with Kubernetes
 
 This application is written in node.js express, there is an image created with the
 dockerfile [here]([https://hub.docker.com/repository/docker/zelhs/randomstring/general](https://hub.docker.com/repository/docker/zelhs/project_server/general)).
