@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: projectserver-dep
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: projectserver
+  template:
+      metadata:
+        labels:
+            app: projectserver
+      spec:
+        containers:
+        - name: projectserver
+          image: zelhs/project_server

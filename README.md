@@ -18,3 +18,13 @@ we then list our pods and get it's logs:
 kubectl get pods
 kubectl logs applicationserver-69f8c59d6-477d9 # applicationserver-69f8c59d6-477d9 was my pod name
 ```
+
+## For Declerative approach
+
+Use the .yml file by executing:
+
+```bash
+kubectl apply -f manifest/Deployment.yml
+```
+
+and repeating the next steps to get the logs.
