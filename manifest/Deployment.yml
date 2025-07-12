@@ -14,4 +14,4 @@ spec:
       spec:
         containers:
         - name: projectserver
-          image: zelhs/project_server
+          image: zelhs/project_server:1.5
