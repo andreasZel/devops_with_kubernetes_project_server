@@ -3,7 +3,7 @@
 This application is written in node.js express, there is an image created with the
 dockerfile [here]([https://hub.docker.com/repository/docker/zelhs/randomstring/general](https://hub.docker.com/repository/docker/zelhs/project_server/general)).
 
-It creates a server that listens by default to port **4000**, or any you put to the env variables
+It creates a server that listens by default to port **4000**, or any you put to the env variable `PORT`
 
 In order to run with kubernetes we first create our cluster with **k3d**:
 ```bash
@@ -28,3 +28,7 @@ kubectl apply -f manifest/Deployment.yml
 ```
 
 and repeating the next steps to get the logs.
+
+## Update 1.5
+
+It also serves a static html page in the specified port
