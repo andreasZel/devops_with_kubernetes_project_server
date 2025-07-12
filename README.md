@@ -32,3 +32,15 @@ and repeating the next steps to get the logs.
 ## Update 1.5
 
 It also serves a static html page in the specified port
+
+## Update 1.6
+
+You need to first, create new cluster with open ports of the nodes as specified:
+
+```bash
+k3d cluster create --port 8082:30080@agent:0 -p 8081:80@loadbalancer --agents 2
+```
+
+then apply both `Deployment` and `Service` in the manifest file.
+
+And you can access the static page with `http://localhost:8082`.
