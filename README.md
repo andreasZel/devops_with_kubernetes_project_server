@@ -44,3 +44,13 @@ k3d cluster create --port 8082:30080@agent:0 -p 8081:80@loadbalancer --agents 2
 then apply both `Deployment` and `Service` in the manifest file.
 
 And you can access the static page with `http://localhost:8082`.
+
+## Update 1.8
+
+Because we used ClusterIP + Ingress to forward our 3000 port of the container to the cluster and to our local machine, we need to apply both services:
+
+```bash
+kubectl apply -f manifest
+```
+
+also now you can access the page from `http://localhost:8081`.
