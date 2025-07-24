@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 
 const { PORT } = process.env;
 const port = PORT ?? 4000;
-const publicDir = path.join(__dirname, 'public');
+const publicDir = path.join(__dirname, 'public', 'image');
 const outputPath = path.join(publicDir, 'cachedImage.png');
 const cachedTimePath = path.join(publicDir, 'time.txt');
 

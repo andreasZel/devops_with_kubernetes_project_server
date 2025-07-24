@@ -8,12 +8,12 @@
 
 <body>
     <h1>MOOC.fi DevOps with Kubernetes</h1>
-    <img id="apiImage" src="cachedImage.png" alt="API Image" />
+    <img id="apiImage" src="image/cachedImage.png" alt="API Image" />
     <script>
         fetch('/getImage')
             .then(() => {
                 const img = document.getElementById('apiImage');
-                img.src = 'cachedImage.png?t=' + Date.now();
+                img.src = 'image/cachedImage.png?t=' + Date.now();
             })
             .catch(err => console.error('Image update failed', err));
     </script>
