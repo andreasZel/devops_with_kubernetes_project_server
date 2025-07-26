@@ -54,3 +54,12 @@ kubectl apply -f manifest
 ```
 
 also now you can access the page from `http://localhost:8081`.
+
+## Update 1.12
+
+There is an addition of a cached image. It uses a persistent volume.
+1. Create a `/imageCache` dir in the `/tmp/kube/` of the **k3d-k3s-default-agent-0** node.
+2. You have to apply it first before applying the manifest:
+   ```bash  
+    kubectl apply -f persistentVolumes -f manifest
+   ```
