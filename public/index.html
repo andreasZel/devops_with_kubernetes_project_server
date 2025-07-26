@@ -9,6 +9,14 @@
 <body>
     <h1>MOOC.fi DevOps with Kubernetes</h1>
     <img id="apiImage" src="image/cachedImage.png" alt="API Image" />
+    <form id="todoForm">
+        <span><input type="text" maxlength="140"/></span>
+        <span><button>Create todo</button></span>
+    </form>
+    <ul>
+        <li>Learn Docker</li>
+        <li>Learn Kubernetes</li>
+    </ul>
     <script>
         fetch('/getImage')
             .then(() => {
