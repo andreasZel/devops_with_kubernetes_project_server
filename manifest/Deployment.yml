@@ -18,7 +18,7 @@ spec:
             claimName: shared-image-pv-claim
         containers:
         - name: projectserver
-          image: zelhs/project_server:1.12
+          image: zelhs/project_server:1.13
           volumeMounts: 
           - name: shared-image
             mountPath: '/usr/app/public/image'
