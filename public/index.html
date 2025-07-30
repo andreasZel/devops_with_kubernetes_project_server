@@ -9,8 +9,8 @@
 <body>
     <h1>MOOC.fi DevOps with Kubernetes</h1>
     <img id="apiImage" src="image/cachedImage.png" alt="API Image" />
-    <form id="todoForm">
-        <span><input type="text" maxlength="140"/></span>
+    <form id="todoForm" onsubmit="createTodo">
+        <span><input type="text" maxlength="140" name="todoText" /></span>
         <span><button>Create todo</button></span>
     </form>
     <ul>
@@ -24,6 +24,27 @@
                 img.src = 'image/cachedImage.png?t=' + Date.now();
             })
             .catch(err => console.error('Image update failed', err));
+
+        const form = document.getElementById('todoForm');
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(form);
+            const todo = formData.get('todoText');
+
+            fetch('/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ newTodo: todo })
+            }).catch((e) => {
+                console.log(e);
+            })
+
+            form.reset();
+        });
     </script>
 </body>
 
