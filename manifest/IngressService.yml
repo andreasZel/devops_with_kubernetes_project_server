@@ -13,3 +13,10 @@ spec:
             name: projectserver-svc
             port:
               number: 2345
+      - path: /todos
+        pathType: Prefix
+        backend:
+          service:
+            name: todos-svc
+            port:
+              number: 2020
