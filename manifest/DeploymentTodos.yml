@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todos-dep
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: todos
+  template:
+      metadata:
+        labels:
+            app: todos
+      spec:
+        volumes: 
+        - name: shared-todos
+          persistentVolumeClaim:
+            claimName: shared-todos-pv-claim
+        containers:
+        - name: todos
+          image: zelhs/todoapp
+          volumeMounts: 
+          - name: shared-todos
+            mountPath: '/usr/app/todos'
