@@ -13,11 +13,31 @@
         <span><input type="text" maxlength="140" name="todoText" /></span>
         <span><button>Create todo</button></span>
     </form>
-    <ul>
+    <ul id="todoListUL">
         <li>Learn Docker</li>
         <li>Learn Kubernetes</li>
     </ul>
     <script>
+        function getTodos() {
+            const todoField = document.getElementById('todoListUL');
+            todoField.innerHTML = '';
+
+            fetch('/todos').then(async (resp) => {
+                const respJSON = await resp.json();
+                
+                for (let todoID in respJSON) {
+                    const li = document.createElement('li');
+                    li.innerText = respJSON[todoID];
+
+                    todoField.appendChild(li);
+                }
+            }).catch((e) => {
+                console.log(e);
+            })
+        }
+
+        getTodos();
+
         fetch('/getImage')
             .then(() => {
                 const img = document.getElementById('apiImage');
@@ -39,6 +59,8 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ newTodo: todo })
+            }).then(() => {
+                getTodos();
             }).catch((e) => {
                 console.log(e);
             })
