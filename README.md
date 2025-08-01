@@ -73,3 +73,11 @@ Added todo functionality, it uses persistent volume.
    ```bash  
     kubectl apply -f persistentVolumes -f manifest
    ```
+
+## Update 2.4
+
+Seperated resources in a namespace `project`, you have to create it:
+
+```bash
+kubectl create namespace exercises
+```
