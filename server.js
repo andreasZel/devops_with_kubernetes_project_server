@@ -2,16 +2,39 @@ const express = require('express');
 const path = require('path');
 const fs = require('node:fs/promises');
 
-const { PORT } = process.env;
-const port = PORT ?? 4000;
-const publicDir = path.join(__dirname, 'public', 'image');
-const outputPath = path.join(publicDir, 'cachedImage.png');
-const cachedTimePath = path.join(publicDir, 'time.txt');
+const {
+    PORT,
+    STATIC_DIR_REL,
+    IMAGE_SOURCE_URL,
+    TEN_MINUTES,
+    IMAGE_DIR_REL,
+    OUTPUT_IMAGE_FILENAME,
+    CACHED_TIME_FILENAME,
+} = process.env;
 
-const TEN_MINUTES = 10 * 60 * 1000;
+const missingEnvVars = [];
+if (!PORT) missingEnvVars.push('PORT');
+if (!STATIC_DIR_REL) missingEnvVars.push('STATIC_DIR_REL');
+if (!TEN_MINUTES) missingEnvVars.push('TEN_MINUTES');
+if (!IMAGE_SOURCE_URL) missingEnvVars.push('IMAGE_SOURCE_URL');
+if (!IMAGE_DIR_REL) missingEnvVars.push('IMAGE_DIR_REL');
+if (!OUTPUT_IMAGE_FILENAME) missingEnvVars.push('OUTPUT_IMAGE_FILENAME');
+if (!CACHED_TIME_FILENAME) missingEnvVars.push('CACHED_TIME_FILENAME');
+
+if (missingEnvVars.length > 0) {
+    console.error(`❌ Missing environment variables: ${missingEnvVars.join(', ')}`);
+    process.exit(1);
+}
+
+const port = Number(PORT);
+const timeoutMs = Number(TEN_MINUTES);
+
+const publicDir = path.join(__dirname, IMAGE_DIR_REL);
+const outputPath = path.join(publicDir, OUTPUT_IMAGE_FILENAME);
+const cachedTimePath = path.join(publicDir, CACHED_TIME_FILENAME);
 
 async function saveImage(currentTime) {
-    const response = await fetch('https://picsum.photos/720');
+    const response = await fetch(IMAGE_SOURCE_URL);
     const buffer = await response.arrayBuffer();
 
     fs.writeFile(outputPath, Buffer.from(buffer));
@@ -20,7 +43,7 @@ async function saveImage(currentTime) {
 
 var app = express();
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, STATIC_DIR_REL)));
 
 app.get('/getImage', async (_, res) => {
     console.log('Chacking image');
@@ -37,7 +60,7 @@ app.get('/getImage', async (_, res) => {
         const currentTime = new Date();
 
         if (time) {
-            if ((currentTime.getTime() - time) > TEN_MINUTES) {
+            if ((currentTime.getTime() - time) > timeoutMs) {
                 await saveImage(currentTime);
             }
         } else {

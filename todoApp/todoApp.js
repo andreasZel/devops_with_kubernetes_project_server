@@ -2,10 +2,26 @@ const express = require('express');
 const path = require('path');
 const fs = require('node:fs/promises');
 
-const { PORT } = process.env;
-const port = PORT ?? 4004;
-const todosDir = path.join(__dirname, 'todos');
-const outputPath = path.join(todosDir, 'todos.json');
+const {
+    PORT,
+    TODOS_DIR_REL,
+    TODOS_FILENAME,
+} = process.env;
+
+const missingEnvVars = [];
+if (!PORT) missingEnvVars.push('PORT');
+if (!TODOS_DIR_REL) missingEnvVars.push('TODOS_DIR_REL');
+if (!TODOS_FILENAME) missingEnvVars.push('TODOS_FILENAME');
+
+if (missingEnvVars.length > 0) {
+    console.error(`❌ Missing environment variables: ${missingEnvVars.join(', ')}`);
+    process.exit(1);
+}
+
+const port = Number(PORT);
+
+const todosDir = path.join(__dirname, TODOS_DIR_REL);
+const outputPath = path.join(todosDir, TODOS_FILENAME);
 
 var app = express();
 
