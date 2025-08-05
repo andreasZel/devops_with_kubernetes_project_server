@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: project
+  name: todo-config
+data:
+  PORT: "3004"
+  TODOS_DIR_REL: "todos"
+  TODOS_FILENAME: "todos.json"
