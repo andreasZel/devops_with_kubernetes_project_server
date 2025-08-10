@@ -1,17 +1,50 @@
-const express = require('express');
-const path = require('path');
-const fs = require('node:fs/promises');
+import express from 'express';
+import dotenv from 'dotenv';
+import pkg from 'pg';
+const { Pool } = pkg;
+
+dotenv.config();
 
 const {
-    PORT,
-    TODOS_DIR_REL,
-    TODOS_FILENAME,
+    PORT
 } = process.env;
+
+async function dbInitAndConnect() {
+    var client = null;
+
+    console.log('Connecting to db');
+
+    try {
+        client = new Pool({
+            host: process.env.POSTGRES_HOST,
+            port: process.env.POSTGRES_PORT,
+            user: process.env.POSTGRES_USER,
+            password: process.env.POSTGRES_PASSWORD,
+            database: process.env.POSTGRES_DB,
+        })
+
+
+    } catch (e) {
+        console.log('Error Connecting to db: ', e)
+        return null;
+    }
+
+    try {
+        await client.query(` CREATE TABLE IF NOT EXISTS todos (
+        id BIGSERIAL PRIMARY KEY,
+        description VARCHAR(140)
+      )`);
+
+        console.log("✅ Table todos check/creation complete.");
+    } catch (err) {
+        console.error("❌ Error creating todos:", err);
+    }
+
+    return client;
+}
 
 const missingEnvVars = [];
 if (!PORT) missingEnvVars.push('PORT');
-if (!TODOS_DIR_REL) missingEnvVars.push('TODOS_DIR_REL');
-if (!TODOS_FILENAME) missingEnvVars.push('TODOS_FILENAME');
 
 if (missingEnvVars.length > 0) {
     console.error(`❌ Missing environment variables: ${missingEnvVars.join(', ')}`);
@@ -19,9 +52,7 @@ if (missingEnvVars.length > 0) {
 }
 
 const port = Number(PORT);
-
-const todosDir = path.join(__dirname, TODOS_DIR_REL);
-const outputPath = path.join(todosDir, TODOS_FILENAME);
+const dbPool = await dbInitAndConnect();
 
 var app = express();
 
@@ -31,8 +62,16 @@ app.get('/todos', async (_, res) => {
     var todos = {};
 
     try {
-        const res = await fs.readFile(outputPath, 'utf8');
-        todos = await JSON.parse(res);
+        const res = await dbPool.query(`SELECT * FROM todos`);
+
+        if (res.rows.length > 0) {
+            for (let todo of res.rows) {
+                todos[todo?.id] = todo?.description ?? '';
+            }
+        } else {
+            console.log('No todos');
+        }
+
     } catch (e) {
         console.log(e);
         res.status(500).send(e?.errorMessage ? e?.errorMessage : 'Error getting Todos');
@@ -50,22 +89,7 @@ app.post('/todos', async (req, res) => {
     }
 
     try {
-        var todos = {};
-
-        try {
-            const res = await fs.readFile(outputPath, 'utf8');
-            todos = await JSON.parse(res);
-        } catch (e) {
-            console.log(e)
-        }
-
-        const keysLength = Object.keys(todos)?.length;
-
-        todos[keysLength + 1] = newTodo;
-
-        const todosToWrite = JSON.stringify(todos);
-        await fs.writeFile(outputPath, todosToWrite);
-
+        const res = await dbPool.query(`INSERT INTO todos(description) VALUES($1)`, [newTodo]);
         res.send();
     } catch (e) {
         console.log(e);
