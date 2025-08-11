@@ -81,3 +81,12 @@ Seperated resources in a namespace `project`, you have to create it:
 ```bash
 kubectl create namespace exercises
 ```
+
+## update 2.8
+
+Added a db to save τοδοσ. For that a `statefulset` service was added. You keed to first apply this,
+with it secrets and headless service by:
+
+```bash
+kubectl apply -f porsgresServices -f manifest
+```
