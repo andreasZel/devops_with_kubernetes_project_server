@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  namespace: project
+  name: random-article-job
+spec:
+  schedule: "0 * * * *"  # every hour at minute 0
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: random-article
+            image: zelhs/random-article:2.9
+          restartPolicy: Never
