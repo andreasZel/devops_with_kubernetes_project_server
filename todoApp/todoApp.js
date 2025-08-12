@@ -89,7 +89,7 @@ app.post('/todos', async (req, res) => {
     }
 
     try {
-        const res = await dbPool.query(`INSERT INTO todos(description) VALUES($1)`, [newTodo]);
+        await dbPool.query(`INSERT INTO todos(description) VALUES($1)`, [newTodo]);
         res.send();
     } catch (e) {
         console.log(e);
