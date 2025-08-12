@@ -20,7 +20,7 @@ async function generateRandomArticle() {
       });
 
       if (!postResponse.ok) {
-        console.error("Failed to post todo");
+        console.error("Failed to post todo: ", response?.statusText);
       }
     } else {
       console.error(`Unexpected status code: ${response.status}`);
