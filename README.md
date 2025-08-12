@@ -88,5 +88,5 @@ Added a db to save τοδοσ. For that a `statefulset` service was added. You k
 with it secrets and headless service by:
 
 ```bash
-kubectl apply -f porsgresServices -f manifest
+kubectl apply -f porsgresServices -f persistentVolumes -f manifest
 ```
