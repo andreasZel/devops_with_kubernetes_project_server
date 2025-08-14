@@ -15,7 +15,7 @@ spec:
       spec:
         containers:
         - name: todos
-          image: zelhs/todoapp:2.8
+          image: zelhs/todoapp:2.10
           env:
             - name: POSTGRES_USER
               valueFrom:
