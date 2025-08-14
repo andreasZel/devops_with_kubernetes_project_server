@@ -84,12 +84,20 @@ app.post('/todos', async (req, res) => {
     const { newTodo } = req?.body;
 
     if (!newTodo) {
+        console.log('Todo was not provided');
         res.status(400).send('Please provide a Todo');
+        return;
+    }
+
+    if (newTodo?.length > 140) {
+        console.log('Todo must not exceed 140 characters!');
+        res.status(400).send('Todo must not exceed 140 characters!');
         return;
     }
 
     try {
         await dbPool.query(`INSERT INTO todos(description) VALUES($1)`, [newTodo]);
+        console.log('Todo inserted successfully!');
         res.send();
     } catch (e) {
         console.log(e);
