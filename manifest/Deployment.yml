@@ -19,7 +19,7 @@ spec:
             claimName: shared-image-pv-claim
         containers:
         - name: projectserver
-          image: zelhs/project_server:2.6
+          image: PROJECT/IMAGE_PROJECT_SERVER
           envFrom:
             - configMapRef:
                 name: projectserver-config

@@ -11,5 +11,5 @@ spec:
         spec:
           containers:
           - name: random-article
-            image: zelhs/random-article:2.9
+            image: PROJECT/IMAGE_RANDOM-ARTICLE
           restartPolicy: Never
