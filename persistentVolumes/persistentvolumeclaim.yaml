@@ -4,7 +4,7 @@ metadata:
   namespace: project
   name: shared-image-pv-claim 
 spec:
-  storageClassName: shared-image-pv 
+  storageClassName: standard
   accessModes:
     - ReadWriteOnce
   resources:
