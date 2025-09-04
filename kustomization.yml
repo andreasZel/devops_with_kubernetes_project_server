@@ -1,13 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./persistentVolumes/persistentvolume.yaml
+  # - ./persistentVolumes/persistentvolume.yaml
   - ./persistentVolumes/persistentvolumeclaim.yaml
   - ./porsgresServices/HeadlessClusterIP.yml
   - ./porsgresServices/PostgresSecret.yml
   - ./porsgresServices/StatefullSetPorsgres.yml
-  - ./manifest/ClusterIPService.yml
-  - ./manifest/ClusterIPTodoService.yml
+  - ./manifest/NodePortService.yml
+  - ./manifest/NodePortTodoService.yml
   - ./manifest/ConfigMap.yml
   - ./manifest/ConfigMapTodo.yml
   - ./manifest/CronJob.yml
@@ -15,8 +15,9 @@ resources:
   - ./manifest/DeploymentTodos.yml
   - ./manifest/IngressService.yml
 images:
-  - name: PROJECT/IMAGE_RANDOM-ARTICLE
+  - name: PROJECT/IMAGE_RANDOM_ARTICLE
     newName: zelhs/random-article
+    newTag: "2.9"
   - name: PROJECT/IMAGE_PROJECT_SERVER
     newName: zelhs/project_server
   - name: PROJECT/IMAGE_TODO_APP
