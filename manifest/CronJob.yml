@@ -11,5 +11,5 @@ spec:
         spec:
           containers:
           - name: random-article
-            image: PROJECT/IMAGE_RANDOM-ARTICLE
+            image: PROJECT/IMAGE_RANDOM_ARTICLE
           restartPolicy: Never
