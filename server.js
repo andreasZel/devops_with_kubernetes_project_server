@@ -45,6 +45,15 @@ var app = express();
 
 app.use(express.static(path.join(__dirname, STATIC_DIR_REL)));
 
+app.get('/', (req, res, next) => {
+ 
+  if (req.get('User-Agent')?.includes('kube-probe')) {
+    return res.status(200).send("OK");
+  }
+  
+  next(); 
+});
+
 app.get('/getImage', async (_, res) => {
     console.log('Chacking image');
 

@@ -58,6 +58,10 @@ var app = express();
 
 app.use(express.json());
 
+app.get('/', (_, res) => {
+    res.status(200).send("OK");
+})
+
 app.get('/todos', async (_, res) => {
     var todos = {};
 
