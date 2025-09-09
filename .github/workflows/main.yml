@@ -12,6 +12,7 @@ env:
   REGISTRY: europe-north1-docker.pkg.dev
   REPOSITORY: my-repository # Artifact registry for images
   BRANCH: ${{ github.ref_name }}
+  GKE_SA_KEY: ${{ secrets.GKE_SA_KEY }}
 
   # image names
   IMAGE_SERVER: zelhs/project_server
@@ -29,7 +30,7 @@ jobs:
 
       - uses: google-github-actions/auth@v2
         with:
-          credentials_json: '${{ secrets.GKE_SA_KEY }}'
+          credentials_json: '${{ env.GKE_SA_KEY }}'
 
       - name: 'Set up Cloud SDK'
         uses: google-github-actions/setup-gcloud@v2
