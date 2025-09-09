@@ -17,10 +17,7 @@ resources:
 images:
   - name: PROJECT/IMAGE_RANDOM_ARTICLE
     newName: zelhs/random-article
-    newTag: "2.9"
   - name: PROJECT/IMAGE_PROJECT_SERVER
     newName: zelhs/project_server
-    newTag: "3.5"
   - name: PROJECT/IMAGE_TODO_APP
     newName: zelhs/todoapp
-    newTag: "3.5.1"
