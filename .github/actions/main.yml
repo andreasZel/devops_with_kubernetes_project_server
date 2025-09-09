@@ -13,7 +13,7 @@ env:
   REPOSITORY: my-repository # Artifact registry for images
   BRANCH: ${{ github.ref_name }}
 
-  # image names
+  #image names
   IMAGE_SERVER: zelhs/project_server
   IMAGE_TODO: zelhs/todoapp
   IMAGE_RANDOM: zelhs/random-article
