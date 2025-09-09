@@ -10,7 +10,7 @@ env:
   GKE_CLUSTER: dwk-cluster
   GKE_ZONE: europe-north1-b
   REGISTRY: europe-north1-docker.pkg.dev
-  REPOSITORY: my-repository
+  REPOSITORY: my-repository # Artifact registry 
   BRANCH: ${{ github.ref_name }}
 
   # image names
