@@ -12,7 +12,7 @@ env:
   REGISTRY: europe-north1-docker.pkg.dev
   REPOSITORY: my-repository # Artifact registry for images
   BRANCH: ${{ github.ref_name }}
-  GKE_SA_KEY: ${{ secrets.GKE_SA_KEY }}
+  GKE_SA_KEY: ${{ secrets.GKE_SA_KEY }} # GKE key in env
 
   # image names
   IMAGE_SERVER: zelhs/project_server
