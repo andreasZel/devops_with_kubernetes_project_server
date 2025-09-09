@@ -53,19 +53,19 @@ jobs:
       # Build & Push Server
       - name: Build & Push project_server
         run: |
-          docker build -t $IMAGE_TAG_SERVER ./project_server
+          docker build -t $IMAGE_TAG_SERVER .
           docker push $IMAGE_TAG_SERVER
 
       # Build & Push todoApp
       - name: Build & Push todoApp
         run: |
-          docker build -t $IMAGE_TAG_TODO ./project_server/todoApp
+          docker build -t $IMAGE_TAG_TODO ./todoApp
           docker push $IMAGE_TAG_TODO
 
       # Build & Push createRandomTodo
       - name: Build & Push createRandomTodo
         run: |
-          docker build -t $IMAGE_TAG_RANDOM ./project_server/createRandomTodo
+          docker build -t $IMAGE_TAG_RANDOM ./createRandomTodo
           docker push $IMAGE_TAG_RANDOM
 
       # Deploy
