@@ -78,6 +78,6 @@ jobs:
           kustomize edit set image PROJECT/IMAGE_TODO=$IMAGE_TAG_TODO
           kustomize edit set image PROJECT/IMAGE_RANDOM=$IMAGE_TAG_RANDOM
           kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment projectserver-dep
-          kubectl rollout status deployment todos-dep
-          kubectl get cronjob random-article-job
+          kubectl rollout status deployment projectserver-dep -n project
+          kubectl rollout status deployment todos-dep -n project
+          kubectl get cronjob random-article-job -n project
