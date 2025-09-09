@@ -6,13 +6,11 @@ on:
       - main  
 
 env:
-  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   GKE_CLUSTER: dwk-cluster
   GKE_ZONE: europe-north1-b
   REGISTRY: europe-north1-docker.pkg.dev
   REPOSITORY: my-repository # Artifact registry for images
   BRANCH: ${{ github.ref_name }}
-  GKE_SA_KEY: ${{ secrets.GKE_SA_KEY }} # GKE key in env
 
   # image names
   IMAGE_SERVER: zelhs/project_server
@@ -23,6 +21,9 @@ jobs:
   build-publish-deploy:
     name: Build, Publish and Deploy
     runs-on: ubuntu-latest
+    env:
+      GKE_SA_KEY: ${{ secrets.GKE_SA_KEY }}
+      PROJECT_ID: ${{ secrets.GKE_PROJECT }}
 
     steps:
       - name: Checkout
