@@ -40,7 +40,7 @@ jobs:
 
       - name: Cleanup namespace
         run: |
-          branch=${github.event.ref}
+          branch="${{ github.event.ref }}"
 
           if [[ "$branch" == "main" ]]; then
             exit 0
@@ -50,7 +50,7 @@ jobs:
 
       - name: Cleanup images
         run: |
-          branch=${github.event.ref}
+          branch="${{ github.event.ref }}"
           if [[ "$branch" == "main" ]]; then
             exit 0
           fi
