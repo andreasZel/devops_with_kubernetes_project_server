@@ -47,14 +47,3 @@ jobs:
           fi
 
           kubectl delete namespace "$branch" --ignore-not-found=true
-
-      - name: Cleanup images
-        run: |
-          branch="${{ github.event.ref }}"
-          if [[ "$branch" == "main" ]]; then
-            exit 0
-          fi
-
-          gcloud artifacts docker images delete "$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_SERVER:$branch-*" --quiet --delete-tags || true
-          gcloud artifacts docker images delete "$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_TODO:$branch-*" --quiet --delete-tags || true
-          gcloud artifacts docker images delete "$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_RANDOM:$branch-*" --quiet --delete-tags || true
