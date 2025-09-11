@@ -90,3 +90,71 @@ with it secrets and headless service by:
 ```bash
 kubectl apply -f porsgresServices -f persistentVolumes -f manifest
 ```
+
+## update 3.9
+
+### Comparison between DBaaS and DIY Db Solution
+
+As described, there are different ways to compare the two approaches.
+These are
+
+1. The required work to initialize and run
+2. Maintenance needed
+3. Scalability, Availability
+4. The cost of running
+
+### 1. Work needed
+
+1. For the `DBaaS`, the required work is mainly done in the GKE interface:
+
+   We have to first Create a `Cloud SQL Instance`, we do so by:
+
+   > Google Cloud Console > SQL > Create Instance and choosing PostgreSQL
+
+   then whe define different things for where this service will be deployed. As i understand this runs outside our cluster, so we need to define **Instance ID**, the **Region-Zone**,
+   **Machine type and storage**. At last there is an option for **High availability** but it's optional.
+
+   Then we setup the postgres password 
+
+   And lastly we configured the networking. A simple dolution i found was a **Private IP**.
+
+   We enable **Private IP** on our Cloud SQL instance and ensure our GKE cluster nodes are on the same VPC/subnet.
+
+   Use the private IP address like so:
+
+   ```bash
+   postgresql://postgres:MY_PASSWORD@10.23.45.67:5432/mydb
+   ```
+
+   then there are options for **automated backups**
+
+
+2. For `DIY`, as we were taught, the best aproach is a `StatefulSet`. This ensures our data stays the same, because an identical pod will replace the previous and the volumes attached to it won't be deleted if pod is destroyed. The lifecycle is not attached to the pod.
+
+   To create them, as described in class, we need to make a StatefulSet.yml file and an associate Headless service.
+
+### 2. Maintenance needed
+
+1. `DBaaS` does backup and provides availability by itself
+2. `DIY` requires DevOps to take regular backups by themselves and observe for unexpected behaviour, but this can be done as we saw with `CronJobs` and other tools like `Promethius`, `Graphana` and `Loki`.
+
+### 3. Scalability, Availability
+
+1. `DBaaS` can support auto use a standby replica with High availability enabled, but even if not enabled Database is external to GKE, so nothing happens to our data if pod or node crashes. Even if cluster shutsdown the pods will connect to the service again.
+
+   For Scalability, **not much is supported for horizontal scaling**, meaning multiple writable Postgres nodes, just read ones, but **vertical scaling** is very easy, we just defined it in the GKE interface.
+
+2. `DYI`, the same works for availability, just there is no option for standby replica. The pods or Nodes will be down, but when kubernetes will spin up new ones the data will remane. Even if cluster is shutdown persistent sisks backing our PVCs are stored in Google Cloud independently of the cluster as stated in the class, so the new pods will just be reattached.
+
+   For Scalability, **Vertical Scaling is again available** using Helm charts or editing the stateful set. But **horizontal scaling needs manual configuration even for read nodes**, it can be done but it needs experience DevOps.
+
+### 4. Cost
+
+The cost of `DBaaS` as we can see from the above comes down to the service cost, meaning fewer human actual developer costs.
+
+The cost of `DYI` is the oposite, needing higher cost in developer but fewer in service.
+
+One could argue that if we have a highly traffic app, we would need the `DBaas` to know we have the best approach and setup.
+
+Even so, If we want to be flexible and custom we can use `DYI` and migrate easier to maybe another cloud or on premise. We just need to accept that constant monitoring-updating-backup will be needed. 
+
