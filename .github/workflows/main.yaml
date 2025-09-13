@@ -15,6 +15,7 @@ env:
   IMAGE_SERVER: zelhs/project_server
   IMAGE_TODO: zelhs/todoapp
   IMAGE_RANDOM: zelhs/random-article
+  IMAGE_BACKUP: zelhs/backup-service
 
 jobs:
   build-publish-deploy:
@@ -47,6 +48,7 @@ jobs:
           echo "IMAGE_TAG_SERVER=$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_SERVER:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
           echo "IMAGE_TAG_TODO=$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_TODO:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
           echo "IMAGE_TAG_RANDOM=$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_RANDOM:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
+          echo "IMAGE_TAG_BACKUP=$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BACKUP:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
 
       # Build & Push Server
       - name: Build & Push project_server
@@ -66,6 +68,12 @@ jobs:
           docker build -t $IMAGE_TAG_RANDOM ./createRandomTodo
           docker push $IMAGE_TAG_RANDOM
 
+      # Build & Push backup-service
+      - name: Build & Push backup
+        run: |
+          docker build -t $IMAGE_TAG_BACKUP ./todoApp/backup
+          docker push $IMAGE_TAG_BACKUP
+          
       # Deploy
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2.1.0
@@ -81,12 +89,19 @@ jobs:
           fi
 
           kubectl create namespace "$namespaceToUse" || true
+          
+          # Apply secrets in the correct namespace
+          export SOPS_AGE_KEY="${{ secrets.SOPS_AGE_KEY }}"
+          sops -d ./manifest/secret.enc.yml | kubectl apply -n "$namespaceToUse" -f -
+          
           kubectl config set-context --current --namespace="$namespaceToUse"
           kustomize edit set namespace "$namespaceToUse"
           kustomize edit set image PROJECT/IMAGE_SERVER=$IMAGE_TAG_SERVER
           kustomize edit set image PROJECT/IMAGE_TODO=$IMAGE_TAG_TODO
           kustomize edit set image PROJECT/IMAGE_RANDOM=$IMAGE_TAG_RANDOM
+          kustomize edit set image PROJECT/IMAGE_BACKUP=$IMAGE_TAG_BACKUP
           kustomize build . | kubectl apply -f -
           kubectl rollout status deployment projectserver-dep -n project --timeout=600s
           kubectl rollout status deployment todos-dep -n project --timeout=600s
           kubectl get cronjob random-article-job -n project
+          kubectl get cronjob db-backup -n "$namespaceToUse"
