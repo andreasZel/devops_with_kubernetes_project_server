@@ -14,6 +14,7 @@ resources:
   - ./manifest/Deployment.yml
   - ./manifest/DeploymentTodos.yml
   - ./manifest/IngressService.yml
+  - ./manifest/BackupTodoCronJob.yml
 images:
   - name: PROJECT/IMAGE_RANDOM_ARTICLE
     newName: zelhs/random-article
@@ -21,3 +22,5 @@ images:
     newName: zelhs/project_server
   - name: PROJECT/IMAGE_TODO_APP
     newName: zelhs/todoapp
+  - name: PROJECT/IMAGE_BACKUP
+    newName: zelhs/backup-service
