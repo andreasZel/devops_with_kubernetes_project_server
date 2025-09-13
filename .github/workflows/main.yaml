@@ -109,7 +109,7 @@ jobs:
           kustomize edit set image PROJECT/IMAGE_RANDOM=$IMAGE_TAG_RANDOM
           kustomize edit set image PROJECT/IMAGE_BACKUP=$IMAGE_TAG_BACKUP
           kustomize build . | kubectl apply -f -
-          kubectl rollout status deployment projectserver-dep -n project --timeout=600s
-          kubectl rollout status deployment todos-dep -n project --timeout=600s
-          kubectl get cronjob random-article-job -n project
+          kubectl rollout status deployment projectserver-dep -n "$namespaceToUse" --timeout=600s
+          kubectl rollout status deployment todos-dep -n "$namespaceToUse" --timeout=600s
+          kubectl get cronjob random-article-job -n "$namespaceToUse"
           kubectl get cronjob db-backup -n "$namespaceToUse"
