@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: backup
+              image: PROJECT/IMAGE_BACKUP
+              env:
+                - name: URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-backup-secrets
+                      key: URL
+                - name: BUCKET_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: gcp-backup   # Use the SOPS-applied secret
+                      key: BUCKET_NAME
+                - name: GOOGLE_APPLICATION_CREDENTIALS
+                  value: /secrets/SERVICE_ACCOUNT_JSON  # Mount path to the key
+              volumeMounts:
+                - name: gcp-creds
+                  mountPath: /secrets
+                  readOnly: true
+          restartPolicy: OnFailure
+          volumes:
+            - name: gcp-creds
+              secret:
+                secretName: gcp-backup   # Secret applied from SOPS
