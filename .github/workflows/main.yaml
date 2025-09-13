@@ -74,6 +74,14 @@ jobs:
           docker build -t $IMAGE_TAG_BACKUP ./todoApp/backup
           docker push $IMAGE_TAG_BACKUP
           
+      - name: Install SOPS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg wget
+          wget https://github.com/getsops/sops/releases/download/v3.10.2/sops-v3.10.2.linux.amd64
+          chmod +x sops-v3.10.2.linux.amd64
+          sudo mv sops-v3.10.2.linux.amd64 /usr/local/bin/sops          
+
       # Deploy
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2.1.0
