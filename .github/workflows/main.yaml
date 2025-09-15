@@ -99,9 +99,9 @@ jobs:
           kubectl create namespace "$namespaceToUse" || true
           
           # Apply secrets in the correct namespace
-          
+
           export SOPS_AGE_KEY="${{ secrets.SOPS_AGE_KEY }}"
-          sops -d ./manifest/gcp-backup.secret.enc.yaml | kubectl apply -n "$namespaceToUse" -f -
+          sops --decrypt --encrypted-regex '^(stringData)$' ./manifest/gcp-backup.secret.enc.yaml | kubectl apply -n "$namespaceToUse" -f -
           
           kubectl config set-context --current --namespace="$namespaceToUse"
           kustomize edit set namespace "$namespaceToUse"
