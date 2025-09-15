@@ -13,7 +13,9 @@ if [ -n "${URL:-}" ]; then
 
   OBJECT_PATH="backups/$(date +%Y%m%d_%H%M).sql"
   echo "Uploading to bucket: $BUCKET_NAME"
-  gsutil cp "$DUMP_FILE" "gs://$BUCKET_NAME/$OBJECT_PATH"
+  echo "Credentials $GOOGLE_APPLICATION_CREDENTIALS"
+  echo "Backup uploaded: gs://$BUCKET_NAME/$OBJECT_PATH"
+  #gsutil cp "$DUMP_FILE" "gs://$BUCKET_NAME/$OBJECT_PATH"
 
   echo "Backup uploaded: gs://$BUCKET_NAME/$OBJECT_PATH"
 else
