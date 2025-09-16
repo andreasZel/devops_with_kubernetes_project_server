@@ -15,7 +15,7 @@ resources:
   - ./manifest/IngressService.yml
   - ./manifest/BackupTodoCronJob.yml
 images:
-  - name: PROJECT/IMAGE_RANDOM_ARTICLE
+  - name: PROJECT/IMAGE_RANDOM
     newName: zelhs/random-article
   - name: PROJECT/IMAGE_PROJECT_SERVER
     newName: zelhs/project_server
