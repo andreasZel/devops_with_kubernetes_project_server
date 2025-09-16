@@ -1,21 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "=== DEBUGGING CREDENTIALS ==="
-echo "GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
-ls -la /secrets/
-echo "Checking if credentials file exists:"
-if [ -f "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
-    echo "✅ Credentials file exists"
-    echo "File size: $(wc -c < "$GOOGLE_APPLICATION_CREDENTIALS") bytes"
-else
-    echo "❌ Credentials file does not exist"
-    exit 1
-fi
+echo "Activating service account..."
+gcloud auth activate-service-account --key-file="$GOOGLE_APPLICATION_CREDENTIALS"
 
-echo "Testing gcloud auth:"
+echo "Current authenticated account:"
 gcloud auth list
-echo "=== END DEBUGGING ==="
+
+gcloud auth configure-docker --quiet
 
 if [ -n "${POSTGRES_USER:-}" ] && [ -n "${POSTGRES_PASSWORD:-}" ] && [ -n "${POSTGRES_HOST:-}" ] && [ -n "${POSTGRES_PORT:-}" ] && [ -n "${POSTGRES_DB:-}" ]; then
     export URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
