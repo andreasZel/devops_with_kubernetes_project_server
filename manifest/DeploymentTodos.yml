@@ -16,6 +16,13 @@ spec:
         containers:
         - name: todos
           image: PROJECT/IMAGE_TODO_APP
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
           env:
             - name: POSTGRES_USER
               valueFrom:

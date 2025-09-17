@@ -158,3 +158,33 @@ One could argue that if we have a highly traffic app, we would need the `DBaas` 
 
 Even so, If we want to be flexible and custom we can use `DYI` and migrate easier to maybe another cloud or on premise. We just need to accept that constant monitoring-updating-backup will be needed. 
 
+## Update 3.11
+
+So the cluster i use is --disk-size=32 --num-nodes=3 --machine-type=e2-medium, this means
+i use 2 vCpu cores, 4 GB RAM and 32 GB disk size. 
+
+So each node = 2 vCPUs + 4 GiB RAM. Overall, 3 nodes, so **6 vCPUs + 12 GiB RAM**.
+
+For CronJobs, since they run and stop, i setup loghtweight and done every 24hours:
+
+1. for the db backup, since it's mostly I/O bound and network related
+
+   Requests or min: 100m CPU (0.1 CPU) / 128Mi memory
+   Limits or max: 300m CPU (0.3 CPU) / 256Mi memory
+
+2. for the generation of todo, since it's mostly fetches and done every couple of minutes:
+
+   Requests or min: 50m CPU (0.05 CPU) / 64Mi memory 
+   Limits or max: 200m CPU (0.2 CPU) / 128Mi memory 
+
+3. For todo service and express app that serves the Html and listens to endpoints i used a little bit more,
+   just because node is single threaded:
+
+   Requests or min: 200m CPU (0.2 CPU) / 256Mi memory 
+   Limits or max: 500m CPU (0.5 CPU) / 512Mi memory 
+
+4. For the db, statefulset i used a bit more, just because
+   db's are very heavy on resources and might require caching:
+   
+   Requests or min: 500m CPU (0.5 CPU) / 512Mi memory
+   Limits or max: 1 CPU / 1Gi memory
