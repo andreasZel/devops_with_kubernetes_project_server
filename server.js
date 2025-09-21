@@ -45,17 +45,14 @@ var app = express();
 
 app.use(express.static(path.join(__dirname, STATIC_DIR_REL)));
 
-// health check instead of /
-app.get('/healthz', (req, res) => res.status(200).send("OK"));
-
-// app.get('/', (req, res, next) => {
+app.get('/', (req, res, next) => {
  
-//   if (req.get('User-Agent')?.includes('kube-probe')) {
-//     return res.status(200).send("OK");
-//   }
+  if (req.get('User-Agent')?.includes('kube-probe')) {
+    return res.status(200).send("OK");
+  }
   
-//   next(); 
-// });
+  next(); 
+});
 
 app.get('/getImage', async (_, res) => {
     console.log('Chacking image');
