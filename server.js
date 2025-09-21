@@ -45,6 +45,7 @@ var app = express();
 
 app.use(express.static(path.join(__dirname, STATIC_DIR_REL)));
 
+// health check instead of /
 app.get('/healthz', (req, res) => res.status(200).send("OK"));
 
 // app.get('/', (req, res, next) => {
