@@ -14,18 +14,9 @@ spec:
             app: projectserver
       spec:
         volumes: 
-          - name: shared-image
-            persistentVolumeClaim:
-              claimName: shared-image-pv-claim
-          - name: public-files
-            emptyDir: {}
-        initContainers:
-          - name: copy-public
-            image: PROJECT/IMAGE_PROJECT_SERVER
-            command: ['sh', '-c', 'cp -r /usr/app/public/* /shared-public/ 2>/dev/null || echo "Copying public files"; mkdir -p /shared-public/image']
-            volumeMounts:
-            - name: public-files
-              mountPath: /shared-public
+        - name: shared-image
+          persistentVolumeClaim:
+            claimName: shared-image-pv-claim
         containers:
         - name: projectserver
           image: PROJECT/IMAGE_PROJECT_SERVER
@@ -35,8 +26,7 @@ spec:
           volumeMounts: 
           - name: shared-image
             mountPath: '/usr/app/public/image'
-          - name: public-files
-            mountPath: '/usr/app/public'       
+            subPath: image
           resources:
             requests:
               cpu: "200m"
