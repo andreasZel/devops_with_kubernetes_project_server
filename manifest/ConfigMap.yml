@@ -4,10 +4,10 @@ metadata:
   namespace: project
   name: projectserver-config
 data:
-  STATIC_DIR_REL: "public"
+  STATIC_DIR_REL: "/app/static"
   PORT: "3000"
   IMAGE_SOURCE_URL: "https://picsum.photos/720"
   TEN_MINUTES: "600000"
-  IMAGE_DIR_REL: "/usr/app/data/image"
+  IMAGE_DIR_REL: "/app/static/image"
   OUTPUT_IMAGE_FILENAME: "cachedImage.png"
   CACHED_TIME_FILENAME: "time.txt"
