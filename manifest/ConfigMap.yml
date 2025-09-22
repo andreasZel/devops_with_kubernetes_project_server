@@ -8,6 +8,6 @@ data:
   PORT: "3000"
   IMAGE_SOURCE_URL: "https://picsum.photos/720"
   TEN_MINUTES: "600000"
-  IMAGE_DIR_REL: "/data/images"
+  IMAGE_DIR_REL: "public/image"
   OUTPUT_IMAGE_FILENAME: "cachedImage.png"
   CACHED_TIME_FILENAME: "time.txt"
