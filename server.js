@@ -43,7 +43,7 @@ async function saveImage(currentTime) {
 
 var app = express();
 
-app.use('/data/images', express.static('/data/images'));
+app.use('/image', express.static(IMAGE_DIR_REL));
 
 app.use(express.static(path.join(__dirname, STATIC_DIR_REL)));
 
