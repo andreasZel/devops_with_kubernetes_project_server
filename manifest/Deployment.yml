@@ -25,7 +25,7 @@ spec:
                 name: projectserver-config
           volumeMounts: 
           - name: shared-image
-            mountPath: '/data/cache' 
+            mountPath: '/usr/app/public/image'
           resources:
             requests:
               cpu: "200m"

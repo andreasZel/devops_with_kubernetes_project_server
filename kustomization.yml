@@ -17,9 +17,9 @@ resources:
 images:
   - name: PROJECT/IMAGE_RANDOM
     newName: zelhs/random-article
-  - name: PROJECT/IMAGE_PROJECT_SERVER
+  - name: PROJECT/IMAGE_SERVER
     newName: zelhs/project_server
-  - name: PROJECT/IMAGE_TODO_APP
+  - name: PROJECT/IMAGE_TODO
     newName: zelhs/todoapp
   - name: PROJECT/IMAGE_BACKUP
     newName: zelhs/backup-service
