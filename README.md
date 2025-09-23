@@ -188,3 +188,10 @@ For CronJobs, since they run and stop, i setup loghtweight and done every 24hour
    
    Requests or min: 500m CPU (0.5 CPU) / 512Mi memory
    Limits or max: 1 CPU / 1Gi memory
+
+## Update 3.12
+
+Logging is enabled by default in GKE, so if we navigate in `Logging` > `Logs Explorer`, we can see a todo 
+be created as bellow
+
+![logging image](./logging.png)
