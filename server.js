@@ -41,6 +41,42 @@ async function saveImage(currentTime) {
     fs.writeFile(cachedTimePath, currentTime.toISOString());
 }
 
+async function dbInitAndConnect() {
+    var client = null;
+
+    console.log('Connecting to db');
+
+    try {
+        client = new Pool({
+            host: process.env.POSTGRES_HOST,
+            port: process.env.POSTGRES_PORT,
+            user: process.env.POSTGRES_USER,
+            password: process.env.POSTGRES_PASSWORD,
+            database: process.env.POSTGRES_DB,
+        })
+
+
+    } catch (e) {
+        console.log('Error Connecting to db: ', e)
+        return null;
+    }
+
+    try {
+        await client.query(` CREATE TABLE IF NOT EXISTS todos (
+        id BIGSERIAL PRIMARY KEY,
+        description VARCHAR(140)
+      )`);
+
+        console.log("✅ Table todos check/creation complete.");
+    } catch (err) {
+        console.error("❌ Error creating todos:", err);
+    }
+
+    return client;
+}
+
+const dbPool = await dbInitAndConnect();
+
 var app = express();
 
 app.use(express.static(path.join(__dirname, STATIC_DIR_REL)));
@@ -54,21 +90,15 @@ app.get('/', (req, res, next) => {
     next();
 });
 
-app.get('/healtz', async (req, res) => {
+app.get('/healthz', async (_, res) => {
     try {
-        const ready = await fetch('http://todos-svc.project:2020');
-        if (ready.ok) {
-            res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end("OK");
-            return;
-        }
-        console.error("Healthcheck Todo failed:", err.message);
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end("Error with respons from todo");
+        await dbPool.query('SELECT 1');
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end("OK");
     } catch (err) {
-        console.error("Healthcheck failed:", err.message);
+        console.error("Healthcheck DB failed:", err.message);
         res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end("Error with respons from todo");
+        res.end("Error connecting to Db");
     }
 })
 
