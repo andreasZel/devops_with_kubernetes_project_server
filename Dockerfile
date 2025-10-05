@@ -5,6 +5,6 @@ WORKDIR /usr/app
 COPY server.js . 
 COPY public ./public 
 
-RUN npm i express
+RUN npm i
 
 CMD node server.js
