@@ -46,13 +46,31 @@ var app = express();
 app.use(express.static(path.join(__dirname, STATIC_DIR_REL)));
 
 app.get('/', (req, res, next) => {
- 
-  if (req.get('User-Agent')?.includes('kube-probe')) {
-    return res.status(200).send("OK");
-  }
-  
-  next(); 
+
+    if (req.get('User-Agent')?.includes('kube-probe')) {
+        return res.status(200).send("OK");
+    }
+
+    next();
 });
+
+app.get('/healtz', async (req, res) => {
+    try {
+        const ready = await fetch('http://todos-svc.project:2020');
+        if (ready.ok) {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end("OK");
+            return;
+        }
+        console.error("Healthcheck Todo failed:", err.message);
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end("Error with respons from todo");
+    } catch (err) {
+        console.error("Healthcheck failed:", err.message);
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end("Error with respons from todo");
+    }
+})
 
 app.get('/getImage', async (_, res) => {
     console.log('Chacking image');

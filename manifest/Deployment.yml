@@ -20,6 +20,18 @@ spec:
         containers:
         - name: projectserver
           image: PROJECT/IMAGE_SERVER
+          livenessProbe:
+            initialDelaySeconds: 20 # Initial delay until the liveness is tested
+            periodSeconds: 5 # How often to test
+            httpGet:
+               path: /healthz
+               port: 3000
+          readinessProbe:
+            initialDelaySeconds: 10 
+            periodSeconds: 5 
+            httpGet:
+               path: /healthz
+               port: 3000
           envFrom:
             - configMapRef:
                 name: projectserver-config
