@@ -62,6 +62,18 @@ app.get('/', (_, res) => {
     res.status(200).send("OK");
 })
 
+app.get('/healthz', async (_, res) => {
+    try {
+        await dbPool.query('SELECT 1');
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end("OK");
+    } catch (err) {
+        console.error("Healthcheck DB failed:", err.message);
+        res.writeHead(500, { 'Content-Type': 'text/plain' });
+        res.end("Error connecting to Db");
+    }
+})
+
 app.get('/todos', async (_, res) => {
     var todos = {};
 
