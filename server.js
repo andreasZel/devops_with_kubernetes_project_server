@@ -1,6 +1,8 @@
-const express = require('express');
-const path = require('path');
-const fs = require('node:fs/promises');
+import express from 'express';
+import path from 'path';
+import fs from 'node:fs/promises';
+import pkg from 'pg';
+const { Pool } = pkg;
 
 const {
     PORT,
