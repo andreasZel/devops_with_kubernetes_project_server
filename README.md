@@ -195,3 +195,9 @@ Logging is enabled by default in GKE, so if we navigate in `Logging` > `Logs Exp
 be created as bellow
 
 ![logging image](./logging.png)
+
+## Update 4.3
+
+The requested query in promitheus
+
+![promitheus query](./promitheus.png)
