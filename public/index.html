@@ -13,10 +13,13 @@
         <span><input type="text" maxlength="140" name="todoText" /></span>
         <span><button>Create todo</button></span>
     </form>
+    <h2>Todos</h2>
     <ul id="todoListUL">
         <li>Learn Docker</li>
         <li>Learn Kubernetes</li>
     </ul>
+    <h2>Done</h2>
+    <ul id="todoDoneListUL"></ul>
     <script>
         function getTodos() {
             const todoField = document.getElementById('todoListUL');
@@ -24,7 +27,30 @@
 
             fetch('/todos').then(async (resp) => {
                 const respJSON = await resp.json();
-                
+
+                for (let todoID in respJSON) {
+                    const li = document.createElement('li');
+                    li.innerText = respJSON[todoID];
+                    const doneBtn = document.createElement('button');
+                    doneBtn.innerText = 'Mark as Done';
+                    doneBtn.addEventListener('click', () => {
+                        getDoneTodos();
+                    })
+                    li.append(doneBtn);
+                    todoField.appendChild(li);
+                }
+            }).catch((e) => {
+                console.log(e);
+            })
+        }
+
+        function getDoneTodos() {
+            const todoField = document.getElementById('todoDoneListUL');
+            todoField.innerHTML = '';
+
+            fetch('/todos/done').then(async (resp) => {
+                const respJSON = await resp.json();
+
                 for (let todoID in respJSON) {
                     const li = document.createElement('li');
                     li.innerText = respJSON[todoID];
@@ -37,6 +63,7 @@
         }
 
         getTodos();
+        getDoneTodos();
 
         fetch('/getImage')
             .then(() => {
