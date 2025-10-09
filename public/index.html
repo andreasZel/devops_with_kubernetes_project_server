@@ -34,7 +34,7 @@
                     const doneBtn = document.createElement('button');
                     doneBtn.innerText = 'Mark as Done';
                     doneBtn.addEventListener('click', () => {
-                        setDoneTodos(todo.id);
+                        setDoneTodos(todoID);
                     })
                     li.append(doneBtn);
                     todoField.appendChild(li);
