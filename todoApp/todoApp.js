@@ -144,6 +144,20 @@ app.get('/todos/done', async (req, res) => {
     res.send(todos);
 })
 
+app.post('/todos/done/:id', async (req, res) => {
+    var todos = {};
+    const id = req?.params?.id;
+
+    try {
+        await dbPool.query(`UPDATE todos set done = true where id = $1`, [id]);
+    } catch (e) {
+        console.log(e);
+        res.status(500).send(e?.errorMessage ? e?.errorMessage : 'Error getting Todos');
+    }
+
+    res.status(200).send("OK");
+})
+
 app.listen((port), () => {
     console.log(`Server started in port ${port}`)
 });

@@ -34,7 +34,7 @@
                     const doneBtn = document.createElement('button');
                     doneBtn.innerText = 'Mark as Done';
                     doneBtn.addEventListener('click', () => {
-                        getDoneTodos();
+                        setDoneTodos(todo.id);
                     })
                     li.append(doneBtn);
                     todoField.appendChild(li);
@@ -57,6 +57,18 @@
 
                     todoField.appendChild(li);
                 }
+            }).catch((e) => {
+                console.log(e);
+            })
+        }
+
+        function setDoneTodos(id) {
+            const todoField = document.getElementById('todoDoneListUL');
+            todoField.innerHTML = '';
+
+            fetch(`/todos/done/${id}`, { method: 'POST' }).then(() => {
+                getTodos();
+                getDoneTodos();
             }).catch((e) => {
                 console.log(e);
             })
