@@ -32,7 +32,8 @@ async function dbInitAndConnect() {
     try {
         await client.query(` CREATE TABLE IF NOT EXISTS todos (
         id BIGSERIAL PRIMARY KEY,
-        description VARCHAR(140)
+        description VARCHAR(140),
+        done boolean
       )`);
 
         console.log("✅ Table todos check/creation complete.");
@@ -112,13 +113,35 @@ app.post('/todos', async (req, res) => {
     }
 
     try {
-        await dbPool.query(`INSERT INTO todos(description) VALUES($1)`, [newTodo]);
+        await dbPool.query(`INSERT INTO todos(description, done) VALUES($1, false)`, [newTodo]);
         console.log('Todo inserted successfully!');
         res.send();
     } catch (e) {
         console.log(e);
         res.status(500).send();
     }
+})
+
+app.get('/todos/done', async (req, res) => {
+    var todos = {};
+
+    try {
+        const res = await dbPool.query(`SELECT * FROM todos WHERE done = true`);
+
+        if (res.rows.length > 0) {
+            for (let todo of res.rows) {
+                todos[todo?.id] = todo?.description ?? '';
+            }
+        } else {
+            console.log('No todos are done yet');
+        }
+
+    } catch (e) {
+        console.log(e);
+        res.status(500).send(e?.errorMessage ? e?.errorMessage : 'Error getting Todos');
+    }
+
+    res.send(todos);
 })
 
 app.listen((port), () => {
