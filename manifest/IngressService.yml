@@ -23,3 +23,10 @@ spec:
             name: todos-svc
             port:
               number: 2020
+      - path: /todos/done
+        pathType: Prefix
+        backend:
+          service:
+            name: todos-svc
+            port:
+              number: 2020
