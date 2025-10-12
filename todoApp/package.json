@@ -3,6 +3,7 @@
   "dependencies": {
     "dotenv": "^17.2.1",
     "pg": "^8.16.3",
+    "nats": "^2.29.3",
     "express": "^5.1.0"
   }
 }

@@ -36,6 +36,8 @@ spec:
               cpu: "500m"
               memory: "512Mi"
           env:
+            - name: NATS_URL
+              value: nats://my-nats:4222
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:

@@ -1,13 +1,17 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import { connect, StringCodec } from "nats";
 import pkg from 'pg';
 const { Pool } = pkg;
 
 dotenv.config();
 
 const {
-    PORT
+    PORT,
+    NATS_URL
 } = process.env;
+
+const sc = StringCodec();
 
 async function dbInitAndConnect() {
     var client = null;
@@ -46,6 +50,7 @@ async function dbInitAndConnect() {
 
 const missingEnvVars = [];
 if (!PORT) missingEnvVars.push('PORT');
+if (!NATS_URL) missingEnvVars.push('NATS_URL');
 
 if (missingEnvVars.length > 0) {
     console.error(`❌ Missing environment variables: ${missingEnvVars.join(', ')}`);
@@ -54,6 +59,21 @@ if (missingEnvVars.length > 0) {
 
 const port = Number(PORT);
 const dbPool = await dbInitAndConnect();
+
+const nc = await connect({ servers: NATS_URL });
+const jsm = await nc.jetstreamManager();
+
+try {
+    await jsm.streams.add({
+        name: "EVENTS",
+        subjects: ["events.job"],
+    });
+    console.log("NATS Stream created");
+} catch (err) {
+    if (!err.message.includes("stream name already in use")) throw err;
+}
+
+const js = nc.jetstream();
 
 var app = express();
 
@@ -115,6 +135,12 @@ app.post('/todos', async (req, res) => {
     try {
         await dbPool.query(`INSERT INTO todos(description, done) VALUES($1, false)`, [newTodo]);
         console.log('Todo inserted successfully!');
+
+        if (js) {
+            const data = `A todo was created: ${description}`;
+            await js.publish("events.job", sc.encode(data));
+        }
+
         res.send();
     } catch (e) {
         console.log(e);
@@ -149,7 +175,12 @@ app.post('/todos/done/:id', async (req, res) => {
     const id = req?.params?.id;
 
     try {
-        await dbPool.query(`UPDATE todos set done = true where id = $1`, [id]);
+        const result = await dbPool.query(`UPDATE todos set done = true where id = $1 RETURNING description`, [id]);
+
+        if (result.rowCount > 0 && js) {
+            const data = `A todo was marked as done: ${result.rows[0]?.description}`;
+            await js.publish("events.job", sc.encode(data));
+        }
     } catch (e) {
         console.log(e);
         res.status(500).send(e?.errorMessage ? e?.errorMessage : 'Error getting Todos');
