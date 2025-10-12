@@ -137,8 +137,11 @@ app.post('/todos', async (req, res) => {
         console.log('Todo inserted successfully!');
 
         if (js) {
+            console.log('Sending to NAT...')
             const data = `A todo was created: ${newTodo}`;
             await js.publish("events.job", sc.encode(data));
+        } else {
+            console.log('Error sending to NAT...')
         }
 
         res.send();
@@ -175,10 +178,12 @@ app.post('/todos/done/:id', async (req, res) => {
 
     try {
         const result = await dbPool.query(`UPDATE todos SET done = true WHERE id = $1 RETURNING description`, [id]);
-
         if (result.rowCount > 0 && js && sc) {
+            console.log('Sending to NAT...')
             const data = `A todo was marked as done: ${result.rows[0]?.description}`;
             await js.publish("events.job", sc.encode(data));
+        } else {
+            console.log('Problem with sending to NAT...')
         }
 
         res.status(200).send("OK");
