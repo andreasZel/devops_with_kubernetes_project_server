@@ -137,7 +137,7 @@ app.post('/todos', async (req, res) => {
         console.log('Todo inserted successfully!');
 
         if (js) {
-            const data = `A todo was created: ${description}`;
+            const data = `A todo was created: ${newTodo}`;
             await js.publish("events.job", sc.encode(data));
         }
 
@@ -171,23 +171,22 @@ app.get('/todos/done', async (req, res) => {
 })
 
 app.post('/todos/done/:id', async (req, res) => {
-    var todos = {};
     const id = req?.params?.id;
 
     try {
-        const result = await dbPool.query(`UPDATE todos set done = true where id = $1 RETURNING description`, [id]);
+        const result = await dbPool.query(`UPDATE todos SET done = true WHERE id = $1 RETURNING description`, [id]);
 
-        if (result.rowCount > 0 && js) {
+        if (result.rowCount > 0 && js && sc) {
             const data = `A todo was marked as done: ${result.rows[0]?.description}`;
             await js.publish("events.job", sc.encode(data));
         }
-    } catch (e) {
-        console.log(e);
-        res.status(500).send(e?.errorMessage ? e?.errorMessage : 'Error getting Todos');
-    }
 
-    res.status(200).send("OK");
-})
+        res.status(200).send("OK");
+    } catch (e) {
+        console.error(e);
+        return res.status(500).send(e?.message || 'Error marking todo as done');
+    }
+});
 
 app.listen((port), () => {
     console.log(`Server started in port ${port}`)
