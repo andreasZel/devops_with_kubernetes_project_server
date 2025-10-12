@@ -32,9 +32,18 @@ async function run() {
     const jsm = await nc.jetstreamManager();
 
     try {
+        await jsm.streams.info("EVENTS");
+        console.log("✅ Stream EVENTS exists");
+    } catch (err) {
+        console.error("❌ Stream EVENTS does not exist:", err.message);
+        process.exit(1);
+    }
+
+    try {
         await jsm.consumers.add("EVENTS", {
             durable_name: "worker-group",
             ack_policy: "explicit",
+            filter_subject: "events.job",
             deliver_subject: "deliver.worker-group",
         });
 
@@ -58,7 +67,7 @@ async function run() {
             console.log(`Message sent to Discord and acknowledged`);
         } catch (err) {
             console.error(`Error sending to Discord:`, err);
-            m.nak(); 
+            m.nak();
         }
     }
 }
