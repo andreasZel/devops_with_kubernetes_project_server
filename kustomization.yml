@@ -11,6 +11,7 @@ resources:
   - ./manifest/CronJob.yml
   - ./manifest/Deployment.yml
   - ./manifest/DeploymentTodos.yml
+  - ./manifest/DeploymentBroadcaster.yml
   - ./manifest/IngressService.yml
   - ./manifest/BackupTodoCronJob.yml
   - ./persistentVolumes/persistentvolumeclaim.yaml
@@ -23,3 +24,5 @@ images:
     newName: zelhs/todoapp
   - name: PROJECT/IMAGE_BACKUP
     newName: zelhs/backup-service
+  - name: PROJECT/IMAGE_BROADCASTER
+    newName: zelhs/broadcaster
