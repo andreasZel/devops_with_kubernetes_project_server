@@ -26,8 +26,8 @@ spec:
               value: nats://my-nats:4222
           resources:
             requests:
-              cpu: "200m"
-              memory: "256Mi"
+              cpu: "150m"
+              memory: "200Mi"
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: "400m"
+              memory: "400Mi"
