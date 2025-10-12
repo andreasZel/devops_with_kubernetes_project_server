@@ -79,8 +79,8 @@ jobs:
       # Build & Push broadcaster-service
       - name: Build & Push broadcaster
         run: |
-          docker build -t $IMAGE_BROADCASTER ./broadcaster
-          docker push $IMAGE_BROADCASTER
+          docker build -t $IMAGE_TAG_BROADCASTER ./broadcaster
+          docker push $IMAGE_TAG_BROADCASTER
           
       - name: Install SOPS
         run: |
