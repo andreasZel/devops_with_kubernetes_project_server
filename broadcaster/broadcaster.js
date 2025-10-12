@@ -52,8 +52,14 @@ async function run() {
         const data = sc.decode(m.data);
         console.log(`received: ${data}`);
 
-        sendToDiscord(data);
-        m.respond();
+        try {
+            await sendToDiscord(data);
+            m.ack();
+            console.log(`Message sent to Discord and acknowledged`);
+        } catch (err) {
+            console.error(`Error sending to Discord:`, err);
+            m.nak(); 
+        }
     }
 }
 
