@@ -1,4 +1,4 @@
-import { connect, StringCodec } from "nats";
+import { connect, StringCodec, AckPolicy } from "nats";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -30,44 +30,39 @@ async function sendToDiscord(message) {
 async function run() {
     const nc = await connect({ servers: NATS_URL });
     const jsm = await nc.jetstreamManager();
+    const js = nc.jetstream();
 
     try {
         await jsm.streams.info("EVENTS");
         console.log("✅ Stream EVENTS exists");
     } catch (err) {
-        console.error("❌ Stream EVENTS does not exist:", err.message);
+        console.error("Stream does not exist");
         process.exit(1);
     }
 
     try {
+        await jsm.consumers.info("EVENTS", "worker-group");
+        console.log("Consumer already exists");
+    } catch (err) {
         await jsm.consumers.add("EVENTS", {
             durable_name: "worker-group",
-            ack_policy: "explicit",
+            ack_policy: AckPolicy.Explicit,
             filter_subject: "events.job",
-            deliver_subject: "deliver.worker-group",
         });
-
         console.log("Consumer created");
-
-    } catch (err) {
-        if (!err.message.includes("consumer name already in use")) throw err;
     }
 
-    const sub = nc.subscribe("deliver.worker-group", { queue: "my-workers" });
+    const consumer = await js.consumers.get("EVENTS", "worker-group");
+    console.log("Consumer started");
 
-    console.log(`Consumer started`);
-
-    for await (const m of sub) {
-        const data = sc.decode(m.data);
-        console.log(`received: ${data}`);
-
-        try {
+    while (true) {
+        const messages = await consumer.fetch({ max_messages: 1, expires: 5000 });
+        
+        for await (const m of messages) {
+            const data = sc.decode(m.data);
+            console.log(`received: ${data}`);
             await sendToDiscord(data);
             m.ack();
-            console.log(`Message sent to Discord and acknowledged`);
-        } catch (err) {
-            console.error(`Error sending to Discord:`, err);
-            m.nak();
         }
     }
 }
