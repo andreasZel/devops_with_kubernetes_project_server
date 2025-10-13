@@ -140,6 +140,7 @@ app.post('/todos', async (req, res) => {
             console.log('Sending to NAT...')
             const data = `A todo was created: ${newTodo}`;
             await js.publish("events.job", sc.encode(data));
+            console.log('✅ Published to NATS successfully');
         } else {
             console.log('Error sending to NAT...')
         }
@@ -182,6 +183,7 @@ app.post('/todos/done/:id', async (req, res) => {
             console.log('Sending to NAT...')
             const data = `A todo was marked as done: ${result.rows[0]?.description}`;
             await js.publish("events.job", sc.encode(data));
+            console.log('✅ Published to NATS successfully');
         } else {
             console.log('Problem with sending to NAT...')
         }
