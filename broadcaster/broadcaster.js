@@ -44,6 +44,7 @@ async function run() {
             durable_name: "worker-group",
             ack_policy: AckPolicy.Explicit,
             deliver_subject: "deliver.worker-group",
+            deliver_group: "worker-queue",  
             filter_subject: "events.job",
         });
         console.log("Consumer created");
@@ -61,7 +62,7 @@ async function run() {
     for await (const m of sub) {
         const data = sc.decode(m.data);
         console.log(`received: ${data}`);
-        
+
         try {
             await sendToDiscord(data);
             m.ack();
