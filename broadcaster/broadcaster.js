@@ -29,47 +29,42 @@ async function sendToDiscord(message) {
 
 async function run() {
     const nc = await connect({ servers: NATS_URL });
+    console.log("✅ Connected to NATS");
+    
+    const js = nc.jetstream();
     const jsm = await nc.jetstreamManager();
 
-    try {
-        await jsm.streams.info("EVENTS");
-        console.log("✅ Stream EVENTS exists");
-    } catch (err) {
-        console.error("Stream does not exist");
-        process.exit(1);
-    }
+    await jsm.consumers.add("EVENTS", {
+        durable_name: "worker-group",
+        ack_policy: AckPolicy.Explicit,
+        filter_subjects: ["events.job"],
+    });
+    console.log("Pull consumer created");
 
-    try {
-        await jsm.consumers.add("EVENTS", {
-            durable_name: "worker-group",
-            ack_policy: AckPolicy.Explicit,
-            deliver_subject: "deliver.worker-group",
-            deliver_group: "worker-queue",  
-            filter_subject: "events.job",
-        });
-        console.log("Consumer created");
-    } catch (err) {
-        if (err.message.includes("already exists") || err.api_error?.err_code === 10148) {
-            console.log("Consumer already exists");
-        } else {
-            throw err;
-        }
-    }
+    const consumer = await js.consumers.get("EVENTS", "worker-group");
+    console.log("Consumer started, fetching messages...");
 
-    const sub = nc.subscribe("deliver.worker-group", { queue: "worker-queue" });
-    console.log("Consumer started");
-
-    for await (const m of sub) {
-        const data = sc.decode(m.data);
-        console.log(`received: ${data}`);
-
+    while (true) {
         try {
-            await sendToDiscord(data);
-            m.ack();
-            console.log(`Message sent to Discord and acknowledged`);
+            const messages = await consumer.fetch({ max_messages: 10, expires: 30000 });
+            
+            for await (const m of messages) {
+                const data = sc.decode(m.data);
+                console.log(`received: ${data}`);
+                
+                try {
+                    await sendToDiscord(data);
+                    m.ack();
+                    console.log(`✅ Message sent and acked`);
+                } catch (err) {
+                    console.error(`❌ Error:`, err);
+                    m.nak();
+                }
+            }
         } catch (err) {
-            console.error(`Error sending to Discord:`, err);
-            m.nak();
+            if (err.code !== '408') {
+                console.error(`Error fetching:`, err);
+            }
         }
     }
 }
