@@ -30,7 +30,6 @@ async function sendToDiscord(message) {
 async function run() {
     const nc = await connect({ servers: NATS_URL });
     const jsm = await nc.jetstreamManager();
-    const js = nc.jetstream();
 
     try {
         await jsm.streams.info("EVENTS");
@@ -41,28 +40,35 @@ async function run() {
     }
 
     try {
-        await jsm.consumers.info("EVENTS", "worker-group");
-        console.log("Consumer already exists");
-    } catch (err) {
         await jsm.consumers.add("EVENTS", {
             durable_name: "worker-group",
             ack_policy: AckPolicy.Explicit,
+            deliver_subject: "deliver.worker-group",
             filter_subject: "events.job",
         });
         console.log("Consumer created");
+    } catch (err) {
+        if (err.message.includes("already exists") || err.api_error?.err_code === 10148) {
+            console.log("Consumer already exists");
+        } else {
+            throw err;
+        }
     }
 
-    const consumer = await js.consumers.get("EVENTS", "worker-group");
+    const sub = nc.subscribe("deliver.worker-group", { queue: "worker-queue" });
     console.log("Consumer started");
 
-    while (true) {
-        const messages = await consumer.fetch({ max_messages: 1, expires: 5000 });
+    for await (const m of sub) {
+        const data = sc.decode(m.data);
+        console.log(`received: ${data}`);
         
-        for await (const m of messages) {
-            const data = sc.decode(m.data);
-            console.log(`received: ${data}`);
+        try {
             await sendToDiscord(data);
             m.ack();
+            console.log(`Message sent to Discord and acknowledged`);
+        } catch (err) {
+            console.error(`Error sending to Discord:`, err);
+            m.nak();
         }
     }
 }
