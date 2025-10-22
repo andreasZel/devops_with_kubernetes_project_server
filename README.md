@@ -211,3 +211,55 @@ helm install my-nats nats/nats --set config.jetstream.enabled=true --set config.
 ```
 
 then just deploy the kustomize, i use the hook to send images to artifact registry, but you can build iamge locally and upload to dockerHub
+
+## Update 4.8
+
+Applying GitOps in project appears to be a bit more difficult than log output.
+
+The main principal is the same, but i choose to add **SOPS** with age for decryption/encryption. So we have to add **SOPS to the argocd**.
+
+To do that I created a `custom argocd image` that can be created from:
+
+> ./customArgoCd/Dockerfile
+
+You build it and push it to a repo, then after you installed argocd, you add the credentials to a secret with:
+
+```bash
+kubectl -n argocd create secret docker-registry regcred  --docker-username=[user-name] --docker-password=[password] --docker-server=https://index.docker.io/v1/
+```
+
+You add it to the argocd repo server:
+
+```bash
+kubectl -n argocd patch deployment argocd-repo-server --type='json' -p='[{"op": "add", "path": "/spec/template/spec/imagePullSecrets", "value":[{"name":"regcred"}]}]'
+```
+
+You add the SOPS key from the file you have it:
+
+```bash
+kubectl create secret generic sops-age --namespace argocd --from-file=key.txt
+```
+
+You add it to the server as well: 
+
+```bash
+kubectl -n argocd patch deployment argocd-repo-server --type='strategic' -p "{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"argocd-repo-server\",\"image\":\"zelhs/argocd-repo-server-sops:3\",\"volumeMounts\":[{\"name\":\"sops-age\",\"mountPath\":\"/home/argocd/.config/sops/age\"}],\"env\":[{\"name\":\"SOPS_AGE_KEY_FILE\",\"value\":\"/home/argocd/.config/sops/age/key.txt\"}]}],\"volumes\":[{\"name\":\"sops-age\",\"secret\":{\"secretName\":\"sops-age\"}}]}}}}"
+```
+
+and finaly, you tell argocd to decrypth the wanted files:
+
+```bash
+kubectl patch configmap argocd-cm -n argocd --type merge -p '
+data:
+  configManagementPlugins: |
+    - name: sops
+      generate:
+        command: ["bash", "-c"]
+        args:
+          - |
+            sops -d manifest/gcp-backup.secret.enc.yaml
+            sops -d manifest/broadcasterSecret.enc.yml
+'
+```
+
+the rest will be done when pushing changes and if you follow class instructions on how to setup autosync
