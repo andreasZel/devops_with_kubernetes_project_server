@@ -122,6 +122,3 @@ jobs:
             echo "Deploying to staging..."
             kubectl apply -f argocd/applications/staging.yaml
           fi
-        with:
-          add: 'kustomization.yml'
-          message: New version released ${{ github.sha }}
