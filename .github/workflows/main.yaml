@@ -98,20 +98,21 @@ jobs:
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2.1.0
 
-      - name: Use right image for project_server
-        run: kustomize edit set image PROJECT/IMAGE_SERVER=$IMAGE_TAG_SERVER
-      
-      - name: Use right image for todo
-        run: kustomize edit set image PROJECT/IMAGE_TODO=$IMAGE_TAG_TODO
-      
-      - name: Use right image for random
-        run: kustomize edit set image PROJECT/IMAGE_RANDOM=$IMAGE_TAG_RANDOM
-      
-      - name: Use right image for backup
-        run: kustomize edit set image PROJECT/IMAGE_BACKUP=$IMAGE_TAG_BACKUP
-      
-      - name: Use right image for broadcaster
-        run: kustomize edit set image PROJECT/IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
+      - name: Update images in kustomization
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "Updating production images..."
+            cd manifest/overlays/production
+          else
+            echo "Updating staging images..."
+            cd manifest/overlays/staging
+          fi
+          
+          kustomize edit set image PROJECT/IMAGE_SERVER=$IMAGE_TAG_SERVER
+          kustomize edit set image PROJECT/IMAGE_TODO=$IMAGE_TAG_TODO
+          kustomize edit set image PROJECT/IMAGE_RANDOM=$IMAGE_TAG_RANDOM
+          kustomize edit set image PROJECT/IMAGE_BACKUP=$IMAGE_TAG_BACKUP
+          kustomize edit set image PROJECT/IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
 
       - name: Deploy to environment
         run: |
