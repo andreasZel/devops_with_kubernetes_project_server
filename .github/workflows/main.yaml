@@ -2,6 +2,10 @@ name: Release application
 
 on:
   push:
+    branches:
+      - main
+    tags:
+      - 'v*'
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
@@ -109,8 +113,15 @@ jobs:
       - name: Use right image for broadcaster
         run: kustomize edit set image PROJECT/IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
 
-      - name: commit kustomization.yaml to GitHub
-        uses: EndBug/add-and-commit@v9
+      - name: Deploy to environment
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "Deploying to production..."
+            kubectl apply -f argocd/applications/production.yaml
+          else
+            echo "Deploying to staging..."
+            kubectl apply -f argocd/applications/staging.yaml
+          fi
         with:
           add: 'kustomization.yml'
           message: New version released ${{ github.sha }}
