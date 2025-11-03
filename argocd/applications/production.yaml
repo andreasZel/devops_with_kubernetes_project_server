@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/andreasZel/devops_with_kubernetes_project_server.git
     targetRevision: HEAD
-    path: project_server/manifest/overlays/production
+    path: manifest/overlays/production
   destination:
     server: https://kubernetes.default.svc
     namespace: production
