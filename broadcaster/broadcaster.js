@@ -9,6 +9,8 @@ const {
 } = process.env;
 
 const missingEnvVars = [];
+const logOnly = process?.env?.LOG_ONLY === "true";
+
 if (!NATS_URL) missingEnvVars.push('NATS_URL');
 if (!DISCORD_WEBHOOK_URL) missingEnvVars.push('DISCORD_WEBHOOK_URL');
 
@@ -17,9 +19,16 @@ if (missingEnvVars.length > 0) {
     process.exit(1);
 }
 
+console.log(`Starting broadcaster in ${logOnly ? 'LOG_ONLY' : 'NORMAL'} mode`);
+
 const sc = StringCodec();
 
 async function sendToDiscord(message) {
+    if (logOnly) {
+        console.log("LOG_ONLY mode: Would have sent to Discord:", message);
+        return;
+    }
+
     await fetch(DISCORD_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
