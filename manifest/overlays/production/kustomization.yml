@@ -9,6 +9,4 @@ metadata:
 namespace: production
 resources:
 - ../../base
-
-patches:
-- path: patches/BackupTodoCronJob.yml
+- BackupTodoCronJob.yml
