@@ -1,7 +1,6 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  namespace: project
   name: random-article-job
 spec:
   schedule: "0 * * * *"  # every hour at minute 0

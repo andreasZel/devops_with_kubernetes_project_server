@@ -3,7 +3,6 @@ kind: Ingress
 metadata:
   annotations:
     kubernetes.io/ingress.class: "gce"
-  namespace: project
   name: projectserver-ingress
 spec:
   rules:

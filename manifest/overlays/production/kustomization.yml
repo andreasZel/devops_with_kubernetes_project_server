@@ -1,12 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+metadata:
+  name: project-server-production
+  labels:
+    environment: production
+
 namespace: production
-bases:
+resources:
 - ../../base
 
 patches:
 - path: patches/BackupTodoCronJob.yml
-
-commonLabels:
-  environment: production
