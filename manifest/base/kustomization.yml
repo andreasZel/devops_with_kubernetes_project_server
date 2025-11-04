@@ -14,7 +14,6 @@ resources:
 - porsgresServices/PostgresSecret.yml
 - porsgresServices/HeadlessClusterIP.yml
 - porsgresServices/StatefullSetPorsgres.yml
-- BackupTodoCronJob.yml
 - persistentVolumes/persistentvolumeclaim.yaml
 
 images:
