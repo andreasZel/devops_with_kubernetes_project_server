@@ -115,7 +115,7 @@ jobs:
           kustomize edit set image PROJECT/IMAGE_BACKUP=$IMAGE_TAG_BACKUP
           kustomize edit set image PROJECT/IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
           
-          cd $GITHUB_WORKSPACE  # ← Go back to repo root
-          git add $OVERLAY_PATH/kustomization.yaml
+          cd $GITHUB_WORKSPACE  
+          git add $OVERLAY_PATH/kustomization.yml
           git commit -m "Update images for ${{ github.ref_name }}"
           git push
