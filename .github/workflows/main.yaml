@@ -121,5 +121,5 @@ jobs:
       - name: Commit kustomization changes
         uses: EndBug/add-and-commit@v9
         with:
-          add: '${{ env.OVERLAY_PATH }}/kustomization.yaml'
+          add: '${{ env.OVERLAY_PATH }}/kustomization.yml'
           message: 'Update images for ${{ github.ref_name }} - ${{ github.sha }}'
