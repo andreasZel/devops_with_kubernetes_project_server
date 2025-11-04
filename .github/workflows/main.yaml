@@ -98,7 +98,7 @@ jobs:
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2.1.0
 
-      - name: Update images and commit
+      - name: Update images
         run: |
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "Updating production images..."
@@ -107,15 +107,19 @@ jobs:
             echo "Updating staging images..."
             OVERLAY_PATH="manifest/overlays/staging"
           fi
+
+          echo "OVERLAY_PATH=$OVERLAY_PATH" >> $GITHUB_ENV
           
           cd $OVERLAY_PATH
+          
           kustomize edit set image PROJECT/IMAGE_SERVER=$IMAGE_TAG_SERVER
           kustomize edit set image PROJECT/IMAGE_TODO=$IMAGE_TAG_TODO
           kustomize edit set image PROJECT/IMAGE_RANDOM=$IMAGE_TAG_RANDOM
           kustomize edit set image PROJECT/IMAGE_BACKUP=$IMAGE_TAG_BACKUP
           kustomize edit set image PROJECT/IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
           
-          cd $GITHUB_WORKSPACE  
-          git add $OVERLAY_PATH/kustomization.yml
-          git commit -m "Update images for ${{ github.ref_name }}"
-          git push
+      - name: Commit kustomization changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: '${{ env.OVERLAY_PATH }}/kustomization.yaml'
+          message: 'Update images for ${{ github.ref_name }} - ${{ github.sha }}'
