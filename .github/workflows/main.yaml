@@ -114,6 +114,7 @@ jobs:
           kustomize edit set image PROJECT/IMAGE_BACKUP=$IMAGE_TAG_BACKUP
           kustomize edit set image PROJECT/IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
           
-          git add kustomization.yaml
+          cd ../../..  
+          git add manifest/overlays/staging/kustomization.yaml manifest/overlays/production/kustomization.yaml
           git commit -m "Update images for ${{ github.ref_name }}"
           git push

@@ -11,11 +11,11 @@ resources:
 - ConfigMap.yml
 - ConfigMapTodo.yml
 - CronJob.yml
-- ../../porsgresServices/PostgresSecret.yml
-- ../../porsgresServices/HeadlessClusterIP.yml
-- ../../porsgresServices/StatefullSetPorsgres.yml
+- porsgresServices/PostgresSecret.yml
+- porsgresServices/HeadlessClusterIP.yml
+- porsgresServices/StatefullSetPorsgres.yml
 - BackupTodoCronJob.yml
-- ../../persistentVolumes/persistentvolumeclaim.yaml
+- persistentVolumes/persistentvolumeclaim.yaml
 
 images:
 - name: PROJECT/IMAGE_BACKUP
