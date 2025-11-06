@@ -257,9 +257,9 @@ data:
         command: ["bash", "-c"]
         args:
           - |
-            sops -d manifest/gcp-backup.secret.enc.yaml
-            sops -d manifest/broadcasterSecret.enc.yml
+            sops -d manifest/base/gcp-backup.secret.enc.yaml
+            sops -d manifest/base/broadcasterSecret.enc.yml
 '
 ```
 
-the rest will be done when pushing changes and if you follow class instructions on how to setup autosync
+the rest will be done when pushing changes and if you follow class instructions on how to setup autosync.
