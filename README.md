@@ -262,4 +262,4 @@ data:
 '
 ```
 
-the rest will be done when pushing changes and if you follow class instructions on how to setup autosync.
+the rest will be done when pushing changes and if you follow class instructions on how to setup autosync
