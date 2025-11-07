@@ -112,12 +112,12 @@ jobs:
           
           cd $OVERLAY_PATH
           
-          kustomize edit set image PROJECT/IMAGE_SERVER=$IMAGE_TAG_SERVER
-          kustomize edit set image PROJECT/IMAGE_TODO=$IMAGE_TAG_TODO
-          kustomize edit set image PROJECT/IMAGE_RANDOM=$IMAGE_TAG_RANDOM
-          kustomize edit set image PROJECT/IMAGE_BACKUP=$IMAGE_TAG_BACKUP
-          kustomize edit set image PROJECT/IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
-          
+          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_SERVER=$IMAGE_TAG_SERVER
+          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_TODO=$IMAGE_TAG_TODO
+          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_RANDOM=$IMAGE_TAG_RANDOM
+          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BACKUP=$IMAGE_TAG_BACKUP
+          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
+            
       - name: Commit kustomization changes
         uses: EndBug/add-and-commit@v9
         with:
