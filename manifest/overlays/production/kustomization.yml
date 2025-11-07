@@ -10,3 +10,12 @@ namespace: production
 resources:
 - ../../base
 - BackupTodoCronJob.yml
+
+patches:
+- patch: |-
+    - op: replace
+      path: /stringData/POSTGRES_HOST
+      value: "postgres-svc.production.svc.cluster.local"
+  target:
+    kind: Secret
+    name: postgres-secret

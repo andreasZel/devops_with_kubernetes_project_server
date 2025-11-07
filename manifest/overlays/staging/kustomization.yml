@@ -20,6 +20,13 @@ patches:
   target:
     kind: Deployment
     name: broadcaster-dep
+- patch: |-
+    - op: replace
+      path: /stringData/POSTGRES_HOST
+      value: "postgres-svc.staging.svc.cluster.local"
+  target:
+    kind: Secret
+    name: postgres-secret
 
 images:
 - name: PROJECT/IMAGE_BACKUP
