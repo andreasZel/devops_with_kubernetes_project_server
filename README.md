@@ -210,7 +210,7 @@ We need to also install the `official NATS` chart and `enable jetstream to use t
 helm install my-nats nats/nats --set config.jetstream.enabled=true --set config.jetstream.fileStore.pvc.size=1Gi -n project
 ```
 
-then just deploy the kustomize, i use the hook to send images to artifact registry, but you can build iamge locally and upload to dockerHub
+then just deploy the kustomize, i use the hook to send images to artifact registry, but you can build image locally and upload to dockerHub
 
 ## Update 4.8
 
