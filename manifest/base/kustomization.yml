@@ -15,8 +15,6 @@ resources:
 - porsgresServices/HeadlessClusterIP.yml
 - porsgresServices/StatefullSetPorsgres.yml
 - persistentVolumes/persistentvolumeclaim.yaml
-
-generators:
 - gcp-backup.secret.enc.yaml
 - broadcasterSecret.enc.yml
 
