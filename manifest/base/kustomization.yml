@@ -16,6 +16,10 @@ resources:
 - porsgresServices/StatefullSetPorsgres.yml
 - persistentVolumes/persistentvolumeclaim.yaml
 
+generators:
+- gcp-backup.secret.enc.yaml
+- broadcasterSecret.enc.yml
+
 images:
 - name: PROJECT/IMAGE_BACKUP
   newName: europe-west1-docker.pkg.dev/our-reason-470418-t4/my-repository/zelhs/backup-service
