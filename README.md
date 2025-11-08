@@ -263,3 +263,33 @@ data:
 ```
 
 the rest will be done when pushing changes and if you follow class instructions on how to setup autosync
+
+## Update 4.9
+
+The project had to be refactored as:
+
+```yml
+.
+├── argocd
+│   └── applications
+│       ├── staging.yaml
+│       └── production.yaml
+├── manifest
+│   ├── base
+│   ├── ...resources .yml files
+│   └── kustomization.yml
+└── overlays
+    ├── production
+    │   ├── BackupTodoCronJob.yml
+    │   └── kustomization.yml
+    └── staging
+        └── kustomization.yml
+```
+
+So we have to do the previous steps, don't forget NATS and then
+apply the `argocd/applications`.
+
+> Note that I had a problem with connecting as **non root** in the argocd
+custom image, please edit the deployment of argocd-server and make it **false** to work.
+
+Then because we updated the main push action, it will commit and push the correct kustomization (tag -> production, else staging) and argocd will sync.
