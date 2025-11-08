@@ -257,8 +257,8 @@ data:
         command: ["bash", "-c"]
         args:
           - |
-            sops -d manifest/base/gcp-backup.secret.enc.yaml
-            sops -d manifest/base/broadcasterSecret.enc.yml
+            sops -d manifest/gcp-backup.secret.enc.yaml
+            sops -d manifest/broadcasterSecret.enc.yml
 '
 ```
 
@@ -291,5 +291,21 @@ apply the `argocd/applications`.
 
 > Note that I had a problem with connecting as **non root** in the argocd
 custom image, please edit the deployment of argocd-server and make it **false** to work.
+
+> Also we need to change the path the Argocd's sops will decrypt our secrets, so please apply the correct path `manifest/base`:
+
+```bash
+kubectl patch configmap argocd-cm -n argocd --type merge -p '
+data:
+  configManagementPlugins: |
+    - name: sops
+      generate:
+        command: ["bash", "-c"]
+        args:
+          - |
+            sops -d manifest/base/gcp-backup.secret.enc.yaml
+            sops -d manifest/base/broadcasterSecret.enc.yml
+'
+```
 
 Then because we updated the main push action, it will commit and push the correct kustomization (tag -> production, else staging) and argocd will sync.
