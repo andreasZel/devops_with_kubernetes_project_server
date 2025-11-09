@@ -117,8 +117,12 @@ jobs:
           
           cd ../../../..
           cd config-repo
+          
+          # Configure git with token
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.CONFIG_REPO_TOKEN }}@github.com/andreasZel/devops_with_kubernetes_project_server_configuration.git
+          
           git add .
           git commit -m "Update $ENV images - ${{ github.ref_name }}@${{ github.sha }}"
-          git push
+          git push origin HEAD:main
