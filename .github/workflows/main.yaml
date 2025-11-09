@@ -70,23 +70,43 @@ jobs:
           docker build -t $IMAGE_TAG_BROADCASTER ./broadcaster
           docker push $IMAGE_TAG_BROADCASTER
 
-      # Trigger config repo update
-      - name: Trigger Config Repository Update
+      # Directly update config repo
+      - name: Checkout config repository
+        uses: actions/checkout@v4
+        with:
+          repository: https://api.github.com/repos/andreasZel/devops_with_kubernetes_project_server_configuration
+          token: ${{ secrets.CONFIG_REPO_TOKEN }}
+          path: config-repo
+
+      - name: Set up Kustomize
+        uses: imranismail/setup-kustomize@v2.1.0
+
+      - name: Update config repository
         run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.CONFIG_REPO_TOKEN }}" \
-            https://api.github.com/repos/andreasZel/devops_with_kubernetes_project_server_configuratio/dispatches \
-            -d '{
-              "event_type": "update-images",
-              "client_payload": {
-                "branch": "${{ github.ref_name }}",
-                "sha": "${{ github.sha }}",
-                "is_tag": "${{ startsWith(github.ref, '\''refs/tags/'\'') }}",
-                "image_server": "'"$IMAGE_TAG_SERVER"'",
-                "image_todo": "'"$IMAGE_TAG_TODO"'",
-                "image_random": "'"$IMAGE_TAG_RANDOM"'",
-                "image_backup": "'"$IMAGE_TAG_BACKUP"'",
-                "image_broadcaster": "'"$IMAGE_TAG_BROADCASTER"'"
-              }
-            }'
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            OVERLAY_PATH="config-repo/manifest/overlays/production"
+            ENV="production"
+          else
+            OVERLAY_PATH="config-repo/manifest/overlays/staging"
+            ENV="staging"
+          fi
+          
+          cd $OVERLAY_PATH
+          
+          kustomize edit set image \
+            $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_SERVER=$IMAGE_TAG_SERVER
+          kustomize edit set image \
+            $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_TODO=$IMAGE_TAG_TODO
+          kustomize edit set image \
+            $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_RANDOM=$IMAGE_TAG_RANDOM
+          kustomize edit set image \
+            $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BACKUP=$IMAGE_TAG_BACKUP
+          kustomize edit set image \
+            $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
+          
+          cd ../../..
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update $ENV images - ${{ github.ref_name }}@${{ github.sha }}"
+          git push
