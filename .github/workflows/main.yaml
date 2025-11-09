@@ -74,7 +74,7 @@ jobs:
       - name: Checkout config repository
         uses: actions/checkout@v4
         with:
-          repository: https://api.github.com/repos/andreasZel/devops_with_kubernetes_project_server_configuration
+          repository: andreasZel/devops_with_kubernetes_project_server_configuration
           token: ${{ secrets.CONFIG_REPO_TOKEN }}
           path: config-repo
 
