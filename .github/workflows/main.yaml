@@ -1,4 +1,4 @@
-name: Release application
+name: Build and Push Images
 
 on:
   push:
@@ -9,13 +9,10 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  GKE_CLUSTER: dwk-cluster
-  GKE_ZONE: europe-west1-b
   REGISTRY: europe-west1-docker.pkg.dev
-  REPOSITORY: my-repository #Artifact registry for images
+  REPOSITORY: my-repository
   BRANCH: ${{ github.ref_name }}
 
-  #image names
   IMAGE_SERVER: zelhs/project_server
   IMAGE_TODO: zelhs/todoapp
   IMAGE_RANDOM: zelhs/random-article
@@ -23,8 +20,8 @@ env:
   IMAGE_BROADCASTER: zelhs/broadcaster
 
 jobs:
-  build-publish-deploy:
-    name: Build, Publish and Deploy
+  build-publish:
+    name: Build and Publish
     runs-on: ubuntu-latest
 
     steps:
@@ -40,14 +37,6 @@ jobs:
 
       - run: gcloud --quiet auth configure-docker $REGISTRY
 
-      - name: 'Get GKE credentials'
-        uses: 'google-github-actions/get-gke-credentials@v2'
-        with:
-          cluster_name: '${{ env.GKE_CLUSTER }}'
-          project_id: '${{ env.PROJECT_ID }}'
-          location: '${{ env.GKE_ZONE }}'
-
-      # Form image tags
       - name: 'Form image names'
         run: |
           echo "IMAGE_TAG_SERVER=$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_SERVER:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
@@ -56,70 +45,48 @@ jobs:
           echo "IMAGE_TAG_BACKUP=$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BACKUP:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
           echo "IMAGE_TAG_BROADCASTER=$REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BROADCASTER:$BRANCH-$GITHUB_SHA" >> $GITHUB_ENV
 
-      # Build & Push Server
       - name: Build & Push project_server
         run: |
           docker build -t $IMAGE_TAG_SERVER .
           docker push $IMAGE_TAG_SERVER
 
-      # Build & Push todoApp
       - name: Build & Push todoApp
         run: |
           docker build -t $IMAGE_TAG_TODO ./todoApp
           docker push $IMAGE_TAG_TODO
 
-      # Build & Push createRandomTodo
       - name: Build & Push createRandomTodo
         run: |
           docker build -t $IMAGE_TAG_RANDOM ./createRandomTodo
           docker push $IMAGE_TAG_RANDOM
 
-      # Build & Push backup-service
       - name: Build & Push backup
         run: |
           docker build -t $IMAGE_TAG_BACKUP ./todoApp/backup
           docker push $IMAGE_TAG_BACKUP
      
-      # Build & Push broadcaster-service
       - name: Build & Push broadcaster
         run: |
           docker build -t $IMAGE_TAG_BROADCASTER ./broadcaster
           docker push $IMAGE_TAG_BROADCASTER
-          
-      - name: Install SOPS
+
+      # Trigger config repo update
+      - name: Trigger Config Repository Update
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gnupg wget
-          wget https://github.com/getsops/sops/releases/download/v3.10.2/sops-v3.10.2.linux.amd64
-          chmod +x sops-v3.10.2.linux.amd64
-          sudo mv sops-v3.10.2.linux.amd64 /usr/local/bin/sops          
-
-      # Deploy
-      - name: Set up Kustomize
-        uses: imranismail/setup-kustomize@v2.1.0
-
-      - name: Update images
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            echo "Updating production images..."
-            OVERLAY_PATH="manifest/overlays/production"
-          else
-            echo "Updating staging images..."
-            OVERLAY_PATH="manifest/overlays/staging"
-          fi
-
-          echo "OVERLAY_PATH=$OVERLAY_PATH" >> $GITHUB_ENV
-          
-          cd $OVERLAY_PATH
-          
-          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_SERVER=$IMAGE_TAG_SERVER
-          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_TODO=$IMAGE_TAG_TODO
-          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_RANDOM=$IMAGE_TAG_RANDOM
-          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BACKUP=$IMAGE_TAG_BACKUP
-          kustomize edit set image $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
-            
-      - name: Commit kustomization changes
-        uses: EndBug/add-and-commit@v9
-        with:
-          add: '${{ env.OVERLAY_PATH }}/kustomization.yml'
-          message: 'Update images for ${{ github.ref_name }} - ${{ github.sha }}'
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.CONFIG_REPO_TOKEN }}" \
+            https://api.github.com/repos/andreasZel/devops_with_kubernetes_project_server_configuratio/dispatches \
+            -d '{
+              "event_type": "update-images",
+              "client_payload": {
+                "branch": "${{ github.ref_name }}",
+                "sha": "${{ github.sha }}",
+                "is_tag": "${{ startsWith(github.ref, '\''refs/tags/'\'') }}",
+                "image_server": "'"$IMAGE_TAG_SERVER"'",
+                "image_todo": "'"$IMAGE_TAG_TODO"'",
+                "image_random": "'"$IMAGE_TAG_RANDOM"'",
+                "image_backup": "'"$IMAGE_TAG_BACKUP"'",
+                "image_broadcaster": "'"$IMAGE_TAG_BROADCASTER"'"
+              }
+            }'
