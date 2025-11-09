@@ -27,16 +27,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: true
-          token: ${{ secrets.CONFIG_REPO_TOKEN }}
       
       - name: Checkout config repository
         uses: actions/checkout@v4
         with:
           repository: andreasZel/devops_with_kubernetes_project_server_configuration
-          token: ${{ secrets.CONFIG_REPO_TOKEN }}
           path: config-repo
+          persist-credentials: false
 
       - uses: google-github-actions/auth@v2
         with:
