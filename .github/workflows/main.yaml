@@ -27,6 +27,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.CONFIG_REPO_TOKEN }}
+      
+      - name: Checkout config repository
+        uses: actions/checkout@v4
+        with:
+          repository: andreasZel/devops_with_kubernetes_project_server_configuration
+          token: ${{ secrets.CONFIG_REPO_TOKEN }}
+          path: config-repo
 
       - uses: google-github-actions/auth@v2
         with:
@@ -69,19 +79,20 @@ jobs:
         run: |
           docker build -t $IMAGE_TAG_BROADCASTER ./broadcaster
           docker push $IMAGE_TAG_BROADCASTER
-
-      # Directly update config repo
-      - name: Checkout config repository
-        uses: actions/checkout@v4
-        with:
-          repository: andreasZel/devops_with_kubernetes_project_server_configuration
-          token: ${{ secrets.CONFIG_REPO_TOKEN }}
-          path: config-repo
-
+      
+      - name: Install SOPS
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg wget
+          wget https://github.com/getsops/sops/releases/download/v3.10.2/sops-v3.10.2.linux.amd64
+          chmod +x sops-v3.10.2.linux.amd64
+          sudo mv sops-v3.10.2.linux.amd64 /usr/local/bin/sops
+          
       - name: Set up Kustomize
         uses: imranismail/setup-kustomize@v2.1.0
 
-      - name: Update config repository
+      # Directly update config repo
+      - name: Update config repository submodule
         run: |
           if [[ "${{ github.ref }}" == refs/tags/* ]]; then
             OVERLAY_PATH="config-repo/manifest/overlays/production"
@@ -104,7 +115,8 @@ jobs:
           kustomize edit set image \
             $REGISTRY/$PROJECT_ID/$REPOSITORY/$IMAGE_BROADCASTER=$IMAGE_TAG_BROADCASTER
           
-          cd ../../..
+          cd ../../../..
+          cd config-repo
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
           git add .
