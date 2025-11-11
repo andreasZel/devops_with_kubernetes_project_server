@@ -309,3 +309,15 @@ data:
 ```
 
 Then because we updated the main push action, it will commit and push the correct kustomization (tag -> production, else staging) and argocd will sync.
+
+## Update 4.10
+
+Due to many namespaces we now deploy NATS in **nats** namespace and use it in broadcaster and todo service:
+
+```bash
+helm install my-nats nats/nats --set config.jetstream.enabled=true --set config.jetstream.fileStore.pvc.size=1Gi -n nats
+```
+
+Configurations are moved to [devops_with_kubernetes_project_server_configuration](https://github.com/andreasZel/devops_with_kubernetes_project_server_configuration) repo. When changes are made, images are build and pushed to GKE. 
+
+Then the workflow changes Kustomization file to use the new image tags in staging or deployment namespaces.
